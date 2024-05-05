@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{B876EA93-8
 		DLLs\RossCarlson.Vatsim.Vpilot.Plugins.dll = DLLs\RossCarlson.Vatsim.Vpilot.Plugins.dll
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vPilotMessageAlert", "vPilotMessageAlert\vPilotMessageAlert.csproj", "{2EC85310-D0ED-4247-8CDF-11AC8C3ACA27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VPilotMessageAlert", "vPilotMessageAlert\VPilotMessageAlert.csproj", "{2EC85310-D0ED-4247-8CDF-11AC8C3ACA27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vPilotMessageAlertConsoleTest", "vPilotMessageAlertConsoleTest\vPilotMessageAlertConsoleTest.csproj", "{87020797-7A02-475E-8D82-2B7E8246EF99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VPilotMessageAlertConsoleTest", "vPilotMessageAlertConsoleTest\VPilotMessageAlertConsoleTest.csproj", "{87020797-7A02-475E-8D82-2B7E8246EF99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
