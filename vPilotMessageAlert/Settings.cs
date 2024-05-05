@@ -23,14 +23,8 @@ namespace VPilotMessageAlert.Settings
     {
     }
 
-    public Event(EventAction action, File file)
-    {
-      Action = action;
-      File = file;
-    }
-
-    public EventAction Action { get; set; }
-    public File File { get; set; } = null!;
+    public EventAction Action { get; set; } = EventAction.Unused;
+    public File File { get; set; } = new();
   }
 
   public class File
@@ -39,14 +33,8 @@ namespace VPilotMessageAlert.Settings
     {
     }
 
-    public File(string name, double volume)
-    {
-      Name = name;
-      Volume = volume;
-    }
-
-    public string Name { get; set; } = null!;
-    public double Volume { get; set; }
+    public string Name { get; set; } = "";
+    public double Volume { get; set; } = 1;
   }
 
   public class Logging
@@ -61,22 +49,8 @@ namespace VPilotMessageAlert.Settings
       Level = level;
     }
 
-    public string FileName { get; set; } = null!;
-    public LogLevel Level { get; set; }
-  }
-  public class Monitors
-  {
-    public Monitors()
-    {
-    }
-
-    public Monitors(List<string> vatsimIds)
-    {
-      VatsimIds = vatsimIds;
-    }
-
-    public List<string> VatsimIds { get; set; } = null!;
-
+    public string FileName { get; set; } = "_log.txt";
+    public LogLevel Level { get; set; } = LogLevel.TRACE;
   }
   public class Root
   {
@@ -84,15 +58,21 @@ namespace VPilotMessageAlert.Settings
     {
     }
 
-    public Root(List<Event> events, Logging logging, Monitors monitors)
+    public Root(Logging logging)
     {
-      Events = events;
       Logging = logging;
-      Monitors = monitors;
     }
 
-    public List<Event> Events { get; set; } = null!;
-    public Logging Logging { get; set; } = null!;
-    public Monitors Monitors { get; set; } = null!;
+    public List<Event> Events { get; set; } = new();
+    public Logging Logging { get; set; } = new();
+    public Vatsim Vatsim { get; set; } = new();
+  }
+
+  public class Vatsim
+  {
+    public List<string> Sources { get; set; } = new();
+    public int NoFlightPlanUpdateInterval { get; set; } = int.MaxValue;
+    public int RefreshNoFlightPlanUpdateInterval { get; set; } = int.MaxValue;
+
   }
 }

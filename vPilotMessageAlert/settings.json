@@ -26,7 +26,9 @@
       }
     }
   ],
-  "Monitors": {
-    "VatsimIds": [ "964586" ]
+  "Vatsim": {
+    "Sources": [ "https://data.vatsim.net/v3/vatsim-data.json" ],
+    "NoFlightPlanUpdateInterval": 2,
+    "RefreshFlightPlanUpdateInterval": 10
   }
 }

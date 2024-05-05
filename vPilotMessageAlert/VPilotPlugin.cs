@@ -15,6 +15,7 @@ namespace VPilotMessageAlert
     private BrokerProxy? brokerProxy;
     private ELogging.Logger logger = null!;
     private static readonly VPilotMessageAlert.Settings.Root settings = null!;
+    private VatsimData vatsimData = null!;
 
     static VPilotPlugin()
     {
@@ -53,30 +54,36 @@ namespace VPilotMessageAlert
         });
     }
 
-    private static VPilotMessageAlert.Settings.Root GetDefaultSettings() => new(new(), new("_log.txt", ELogging.LogLevel.DEBUG), new(new()));
+    private static VPilotMessageAlert.Settings.Root GetDefaultSettings() => new(new("_log.txt", ELogging.LogLevel.DEBUG));
 
     public void Initialize(IBroker broker)
     {
       this.logger = ELogging.Logger.Create(this);
-
       this.brokerProxy = new(broker);
-
-      this.brokerProxy.NetworkConnected += Broker_NetworkConnected;
-      this.brokerProxy.NetworkDisconnected += Broker_NetworkDisconnected;
-      this.brokerProxy.RadioMessageReceived += Broker_RadioMessageReceived;
-      this.brokerProxy.SelcalAlertReceived += Broker_SelcalAlertReceived;
+      PostInitialize();
     }
 
     public void Initialize(MockBroker broker)
     {
       this.logger = ELogging.Logger.Create(this);
-
       this.brokerProxy = new(broker);
+      PostInitialize();
+    }
 
+    public void PostInitialize()
+    {
+      EAssert.IsNotNull(this.brokerProxy);
       this.brokerProxy.NetworkConnected += Broker_NetworkConnected;
       this.brokerProxy.NetworkDisconnected += Broker_NetworkDisconnected;
       this.brokerProxy.RadioMessageReceived += Broker_RadioMessageReceived;
       this.brokerProxy.SelcalAlertReceived += Broker_SelcalAlertReceived;
+
+      StartVatsimData();
+    }
+
+    private void StartVatsimData()
+    {
+      this.vatsimData = new(settings.Vatsim);
     }
 
     private void Broker_SelcalAlertReceived(object? sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.SelcalAlertReceivedEventArgs e)
@@ -106,6 +113,10 @@ namespace VPilotMessageAlert
     private void Broker_NetworkConnected(object? sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.NetworkConnectedEventArgs e)
     {
       logger.Log(LogLevel.INFO, "NetworkConnected");
+
+      this.vatsimData.SetMonitoredVatsimId(e.Cid);
+      this.vatsimData.StartDownloading();
+
       var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.Connected);
       logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
       if (rule != null) TryPlaySound(rule.File);

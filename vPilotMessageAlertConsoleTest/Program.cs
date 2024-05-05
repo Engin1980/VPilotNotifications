@@ -11,7 +11,7 @@ plugin.Initialize(broker);
 Console.WriteLine("Broker initialized");
 Thread.Sleep(500);
 Console.WriteLine("Invoking connected");
-broker.InvokeConnected();
+broker.InvokeConnected("1666537");
 Thread.Sleep(1000);
 Console.WriteLine("Invoking message");
 broker.InvokeMessage("EZY5495, hello");

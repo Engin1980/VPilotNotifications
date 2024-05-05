@@ -14,9 +14,9 @@ namespace VPilotMessageAlert
     public event Action<object?, RadioMessageReceivedEventArgs>? RadioMessageReceived;
     public event Action<object?, SelcalAlertReceivedEventArgs>? SelcalAlertReceived;
 
-    public void InvokeConnected()
+    public void InvokeConnected(string cid)
     {
-      this.NetworkConnected?.Invoke(this, new NetworkConnectedEventArgs("964586", "EZY5495", "A20N", "JP-MN", false));
+      this.NetworkConnected?.Invoke(this, new NetworkConnectedEventArgs(cid, "EZY5495", "A20N", "JP-MN", false));
     }
 
     public void InvokeDisconnected()
