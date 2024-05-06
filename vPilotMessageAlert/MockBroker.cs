@@ -9,10 +9,10 @@ namespace VPilotMessageAlert
 {
   public class MockBroker
   {
-    public event Action<object?, NetworkConnectedEventArgs>? NetworkConnected;
-    public event Action<object?, EventArgs>? NetworkDisconnected;
-    public event Action<object?, RadioMessageReceivedEventArgs>? RadioMessageReceived;
-    public event Action<object?, SelcalAlertReceivedEventArgs>? SelcalAlertReceived;
+    public event Action<object, NetworkConnectedEventArgs> NetworkConnected;
+    public event Action<object, EventArgs> NetworkDisconnected;
+    public event Action<object, RadioMessageReceivedEventArgs> RadioMessageReceived;
+    public event Action<object, SelcalAlertReceivedEventArgs> SelcalAlertReceived;
 
     public void InvokeConnected(string cid)
     {

@@ -14,20 +14,20 @@ namespace VPilotMessageAlert
   {
     #region Public Events
 
-    public event Action<object?, NetworkConnectedEventArgs>? NetworkConnected;
+    public event Action<object, NetworkConnectedEventArgs> NetworkConnected;
 
-    public event Action<object?, EventArgs>? NetworkDisconnected;
+    public event Action<object, EventArgs> NetworkDisconnected;
 
-    public event Action<object?, RadioMessageReceivedEventArgs>? RadioMessageReceived;
+    public event Action<object, RadioMessageReceivedEventArgs> RadioMessageReceived;
 
-    public event Action<object?, SelcalAlertReceivedEventArgs>? SelcalAlertReceived;
+    public event Action<object, SelcalAlertReceivedEventArgs> SelcalAlertReceived;
 
     #endregion Public Events
 
     #region Private Fields
 
-    private readonly MockBroker? mock;
-    private readonly IBroker? vpilot;
+    private readonly MockBroker mock;
+    private readonly IBroker vpilot;
 
     #endregion Private Fields
 
@@ -61,22 +61,22 @@ namespace VPilotMessageAlert
 
     #region Private Methods
 
-    private void Broker_NetworkConnected(object? sender, NetworkConnectedEventArgs e)
+    private void Broker_NetworkConnected(object sender, NetworkConnectedEventArgs e)
     {
       this.NetworkConnected?.Invoke(this, e);
     }
 
-    private void Broker_NetworkDisconnected(object? sender, EventArgs e)
+    private void Broker_NetworkDisconnected(object sender, EventArgs e)
     {
       this.NetworkDisconnected?.Invoke(this, e);
     }
 
-    private void Broker_RadioMessageReceived(object? sender, RadioMessageReceivedEventArgs e)
+    private void Broker_RadioMessageReceived(object sender, RadioMessageReceivedEventArgs e)
     {
       this.RadioMessageReceived?.Invoke(this, e);
     }
 
-    private void Broker_SelcalAlertReceived(object? sender, SelcalAlertReceivedEventArgs e)
+    private void Broker_SelcalAlertReceived(object sender, SelcalAlertReceivedEventArgs e)
     {
       this.SelcalAlertReceived?.Invoke(this, e);
     }

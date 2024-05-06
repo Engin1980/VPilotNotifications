@@ -24,7 +24,7 @@ namespace VPilotMessageAlert.Settings
     }
 
     public EventAction Action { get; set; } = EventAction.Unused;
-    public File File { get; set; } = new();
+    public File File { get; set; } = new File();
   }
 
   public class File
@@ -63,16 +63,16 @@ namespace VPilotMessageAlert.Settings
       Logging = logging;
     }
 
-    public List<Event> Events { get; set; } = new();
-    public Logging Logging { get; set; } = new();
-    public Vatsim Vatsim { get; set; } = new();
+    public List<Event> Events { get; set; } = new List<Event>();
+    public Logging Logging { get; set; } = new Logging();
+    public Vatsim Vatsim { get; set; } = new Vatsim();
   }
 
   public class Vatsim
   {
-    public List<string> Sources { get; set; } = new();
+    public List<string> Sources { get; set; } = new List<string>();
     public int NoFlightPlanUpdateInterval { get; set; } = int.MaxValue;
-    public int RefreshNoFlightPlanUpdateInterval { get; set; } = int.MaxValue;
+    public int RefreshFlightPlanUpdateInterval { get; set; } = int.MaxValue;
 
   }
 }

@@ -10,9 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{B876EA93-8
 		DLLs\RossCarlson.Vatsim.Vpilot.Plugins.dll = DLLs\RossCarlson.Vatsim.Vpilot.Plugins.dll
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VPilotMessageAlert", "vPilotMessageAlert\VPilotMessageAlert.csproj", "{2EC85310-D0ED-4247-8CDF-11AC8C3ACA27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotMessageAlert", "VPilotMessageAlert\VPilotMessageAlert.csproj", "{6D5EB17C-9A00-47A5-8905-48CBC8E13436}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VPilotMessageAlertConsoleTest", "vPilotMessageAlertConsoleTest\VPilotMessageAlertConsoleTest.csproj", "{87020797-7A02-475E-8D82-2B7E8246EF99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESystem472", "ESystem472\ESystem472.csproj", "{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ELogging472", "ELogging472\ELogging472.csproj", "{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotMessageAlertConsoleTest", "VPilotMessageAlertConsoleTest\VPilotMessageAlertConsoleTest.csproj", "{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,14 +24,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2EC85310-D0ED-4247-8CDF-11AC8C3ACA27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2EC85310-D0ED-4247-8CDF-11AC8C3ACA27}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2EC85310-D0ED-4247-8CDF-11AC8C3ACA27}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2EC85310-D0ED-4247-8CDF-11AC8C3ACA27}.Release|Any CPU.Build.0 = Release|Any CPU
-		{87020797-7A02-475E-8D82-2B7E8246EF99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{87020797-7A02-475E-8D82-2B7E8246EF99}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{87020797-7A02-475E-8D82-2B7E8246EF99}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{87020797-7A02-475E-8D82-2B7E8246EF99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D5EB17C-9A00-47A5-8905-48CBC8E13436}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D5EB17C-9A00-47A5-8905-48CBC8E13436}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D5EB17C-9A00-47A5-8905-48CBC8E13436}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D5EB17C-9A00-47A5-8905-48CBC8E13436}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,11 @@ using ESystem.Asserting;
 using Microsoft.Extensions.Configuration;
 using NAudio.Wave;
 using RossCarlson.Vatsim.Vpilot.Plugins;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using VPilotMessageAlert;
 
 namespace VPilotMessageAlert
@@ -12,16 +16,20 @@ namespace VPilotMessageAlert
   public class VPilotPlugin : RossCarlson.Vatsim.Vpilot.Plugins.IPlugin
   {
     public string Name => "VPilotMessageAlert";
-    private BrokerProxy? brokerProxy;
-    private ELogging.Logger logger = null!;
-    private static readonly VPilotMessageAlert.Settings.Root settings = null!;
-    private VatsimDataProvider vatsimDataProvider = null!;
-    private string? connectedCallsign;
+    private BrokerProxy brokerProxy;
+    private ELogging.Logger logger = null;
+    private static readonly VPilotMessageAlert.Settings.Root settings = null;
+    private VatsimDataProvider vatsimDataProvider = null;
+    private string connectedCallsign;
+    private static bool isReadyForPostInitialize = false;
 
     static VPilotPlugin()
     {
       var provider = new ConfigurationManager();
-      provider.AddJsonFile("settings.json");
+      if (System.IO.File.Exists("Plugins\\settings.json"))
+        provider.AddJsonFile("Plugins\\settings.json");
+      else
+        provider.AddJsonFile("settings.json");
 
       try
       {
@@ -40,6 +48,8 @@ namespace VPilotMessageAlert
         Logger.Log(typeof(VPilotPlugin), LogLevel.WARNING, "No events are monitored. Update configuration file.");
 
       //TODO add file-exist validation
+      Logger.Log(typeof(VPilotPlugin), LogLevel.TRACE, "Setting ready for postInitialize");
+      isReadyForPostInitialize = true;
     }
 
     private static void RegisterLog()
@@ -58,32 +68,43 @@ namespace VPilotMessageAlert
         li =>
         {
           string s = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {li.Level,-10} {li.SenderName,-20} {li.Message}\n";
-          System.IO.File.AppendAllText(settings.Logging.FileName, s);
+          lock (typeof(VPilotPlugin))
+          {
+            System.IO.File.AppendAllText(settings.Logging.FileName, s);
+          }
         },
         new List<LogRule>()
         {
-          new(".+", settings.Logging.Level)
+          new LogRule(".+", settings.Logging.Level)
         });
     }
 
-    private static VPilotMessageAlert.Settings.Root GetDefaultSettings() => new(new("_log.txt", ELogging.LogLevel.DEBUG));
+    private static VPilotMessageAlert.Settings.Root GetDefaultSettings() => new Settings.Root(new Settings.Logging("_log.txt", ELogging.LogLevel.DEBUG));
 
     public void Initialize(IBroker broker)
     {
       this.logger = ELogging.Logger.Create(this, nameof(VPilotPlugin));
-      this.brokerProxy = new(broker);
+      this.brokerProxy = new BrokerProxy(broker);
+
       PostInitialize();
     }
 
     public void Initialize(MockBroker broker)
     {
       this.logger = ELogging.Logger.Create(this);
-      this.brokerProxy = new(broker);
+      this.brokerProxy = new BrokerProxy(broker);
       PostInitialize();
     }
 
     public void PostInitialize()
     {
+      while (!isReadyForPostInitialize)
+      {
+        this.logger.Log(LogLevel.TRACE, "Not ready for postInitialize");
+        Thread.Sleep(2500);
+      }
+      this.logger.Log(LogLevel.TRACE, "Post initializing");
+
       EAssert.IsNotNull(this.brokerProxy);
       this.brokerProxy.NetworkConnected += Broker_NetworkConnected;
       this.brokerProxy.NetworkDisconnected += Broker_NetworkDisconnected;
@@ -95,10 +116,10 @@ namespace VPilotMessageAlert
 
     private void StartVatsimData()
     {
-      this.vatsimDataProvider = new(settings.Vatsim);
+      this.vatsimDataProvider = new VatsimDataProvider(settings.Vatsim);
     }
 
-    private void Broker_SelcalAlertReceived(object? sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.SelcalAlertReceivedEventArgs e)
+    private void Broker_SelcalAlertReceived(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.SelcalAlertReceivedEventArgs e)
     {
       logger.Log(LogLevel.INFO, "SelcalAlertReceived");
       var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.SelcalAlert);
@@ -106,7 +127,7 @@ namespace VPilotMessageAlert
       if (rule != null) TryPlaySound(rule.File);
     }
 
-    private void Broker_RadioMessageReceived(object? sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.RadioMessageReceivedEventArgs e)
+    private void Broker_RadioMessageReceived(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.RadioMessageReceivedEventArgs e)
     {
       logger.Log(LogLevel.INFO, "RadioMessageReceived");
       var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.RadioMessage);
@@ -118,7 +139,7 @@ namespace VPilotMessageAlert
     private bool IsMessageToMonitoredDataMatch(string message)
     {
       bool ret = false;
-      if (message.Contains(this.connectedCallsign!))
+      if (message.Contains(this.connectedCallsign))
         ret = true;
       else
       {
@@ -129,15 +150,13 @@ namespace VPilotMessageAlert
             ret = true;
           else if (message.Contains(fd.Arrival))
             ret = true;
-          else if (message.Contains(fd.Callsign))
-            ret = true;
         }
       }
       this.logger.Log(LogLevel.DEBUG, $"Message '{message}' checked with result {ret}");
       return ret;
     }
 
-    private void Broker_NetworkDisconnected(object? sender, EventArgs e)
+    private void Broker_NetworkDisconnected(object sender, EventArgs e)
     {
       logger.Log(LogLevel.INFO, "NetworkDisconnected");
       var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.Disconnected);
@@ -145,7 +164,7 @@ namespace VPilotMessageAlert
       if (rule != null) TryPlaySound(rule.File);
     }
 
-    private void Broker_NetworkConnected(object? sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.NetworkConnectedEventArgs e)
+    private void Broker_NetworkConnected(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.NetworkConnectedEventArgs e)
     {
       logger.Log(LogLevel.INFO, "NetworkConnected");
       this.connectedCallsign = e.Callsign;
@@ -171,8 +190,8 @@ namespace VPilotMessageAlert
         this.logger.Log(LogLevel.ERROR, $"Unable to play {file.Name}. Only MP3/WAV is supported.");
         return;
       }
-      WaveChannel32 volumeStream = new(mainOutputStream);
-      WaveOutEvent player = new();
+      WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
+      WaveOutEvent player = new WaveOutEvent();
       player.Init(volumeStream);
       player.Play();
     }

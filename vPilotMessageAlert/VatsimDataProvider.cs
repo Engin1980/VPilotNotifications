@@ -7,31 +7,89 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Runtime;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using VPilotMessageAlert.Settings;
+using static VPilotMessageAlert.VatsimDataProvider;
 
 namespace VPilotMessageAlert
 {
   public class VatsimDataProvider
   {
-    public record MonitoredDataRecord(string Callsign, string Departure, string Arrival, DateTime LastUpdated);
-    public record FlightPlan(string Departure, string Arrival);
-    public record Pilot(int CID, string Callsign, double Latitude, double Longitude);
-    public record Prefile(int CID, string Callsign, FlightPlan Flight_plan, DateTime Last_updated);
-    public record Model(List<Pilot> Pilots, List<Prefile> Prefiles);
+    public class MonitoredDataRecord
+    {
+      public string Departure { get; }
+      public string Arrival { get; }
+      public int RevisionId { get; set; }
+
+      public MonitoredDataRecord(string departure, string arrival, int revisionId)
+      {
+        Departure = departure;
+        Arrival = arrival;
+        RevisionId = revisionId;
+      }
+    }
+
+    public class FlightPlan
+    {
+      public string Departure { get; set; }
+      public string Arrival { get; set; }
+      public int? Revision_id { get; set; }
+
+      public FlightPlan()
+      {
+      }
+    }
+
+    public class Pilot
+    {
+      public int CID { get; set; }
+      public string Callsign { get; set; }
+      public double Latitude { get; set; }
+      public double Longitude { get; set; }
+      public FlightPlan Flight_plan { get; set; }
+      public DateTime Last_updated { get; set; }
+
+      public Pilot()
+      {
+      }
+    }
+
+    public class Prefile
+    {
+      public int CID { get; set; }
+      public string Callsign { get; set; }
+      public FlightPlan Flight_plan { get; set; }
+      public DateTime Last_updated { get; set; }
+
+      public Prefile()
+      {
+      }
+    }
+
+    public class Model
+    {
+      public List<Pilot> Pilots { get; set; }
+      public List<Prefile> Prefiles { get; set; }
+
+      public Model()
+      {
+      }
+    }
 
     private readonly Vatsim settings;
     private readonly System.Timers.Timer updateTimer;
     private readonly Logger logger;
-    private string? monitoredVatsimId = null;
-    private MonitoredDataRecord? monitoredData = null;
+    private string monitoredVatsimId = null;
+    private MonitoredDataRecord monitoredData = null;
 
     public VatsimDataProvider(Vatsim settings)
     {
       EAssert.Argument.IsNotNull(settings, nameof(settings));
       EAssert.Argument.IsTrue(settings.NoFlightPlanUpdateInterval > 0);
-      EAssert.Argument.IsTrue(settings.RefreshNoFlightPlanUpdateInterval > 0);
+      EAssert.Argument.IsTrue(settings.RefreshFlightPlanUpdateInterval > 0);
 
       this.logger = Logger.Create(nameof(VatsimDataProvider));
 
@@ -47,12 +105,12 @@ namespace VPilotMessageAlert
       this.logger.Log(LogLevel.INFO, "Created, with timer interval " + this.updateTimer.Interval);
     }
 
-    private void UpdateTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    private void UpdateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
       InvokeReloadData();
     }
 
-    public MonitoredDataRecord? MonitoredData => this.monitoredData;
+    public MonitoredDataRecord MonitoredData => this.monitoredData;
 
     private void InvokeReloadData()
     {
@@ -61,13 +119,15 @@ namespace VPilotMessageAlert
 
     private async Task ReloadDataAsync()
     {
+      this.logger.Log(LogLevel.TRACE, "Entering update monitor");
       if (!Monitor.TryEnter(this.updateTimer))
       {
+        this.logger.Log(LogLevel.TRACE, "Entering update monitor -- failed");
         // lock did not expire, something wrong?
         this.logger.Log(LogLevel.ERROR, "Update lock did not expire. Too short updating interval or something went wrong during update?");
         return;
       }
-
+      this.logger.Log(LogLevel.TRACE, "Entering update monitor -- success");
       this.logger.Log(LogLevel.INFO, "Reloading VATSIM data");
 
       try
@@ -75,8 +135,14 @@ namespace VPilotMessageAlert
         var data = await DownloadDataAsync();
         UpdateUserData(data);
       }
+      catch (Exception ex)
+      {
+        this.logger.Log(LogLevel.ERROR, "Failed to download or update data.");
+        this.logger.LogException(ex);
+      }
       finally
       {
+        this.logger.Log(LogLevel.TRACE, "Exiting update monitor");
         Monitor.Exit(this.updateTimer);
       }
 
@@ -85,19 +151,50 @@ namespace VPilotMessageAlert
 
     private void UpdateUserData(string data)
     {
-      Model? model = JsonConvert.DeserializeObject<Model>(data);
+      this.logger.Log(LogLevel.TRACE, "Deserializing data");
+      Model model = JsonConvert.DeserializeObject<Model>(data);
+      this.logger.Log(LogLevel.TRACE, "Data deserialized.");
       if (model == null)
       {
         this.logger.Log(LogLevel.ERROR, "Failed to extract vatsim data model from data string of length " + data.Length + ". Skipping.");
         return;
       }
-      var prefile = model.Prefiles.FirstOrDefault(q => q.CID.ToString() == this.monitoredVatsimId);
-      if (prefile != null && (this.monitoredData == null || this.monitoredData.LastUpdated != prefile.Last_updated))
+
+      int mcid = int.Parse(this.monitoredVatsimId);
+      this.logger.Log(LogLevel.TRACE, $"Looking for flight-plan for {mcid} between active pilots");
+      var pilot = model.Pilots.FirstOrDefault(q => q.CID == mcid);
+      FlightPlan fp = null;
+      if (pilot != null)
       {
-        this.monitoredData = new(prefile.Callsign, prefile.Flight_plan.Departure, prefile.Flight_plan.Arrival, prefile.Last_updated);
-        this.updateTimer.Interval = this.settings.RefreshNoFlightPlanUpdateInterval * 60 * 1000;
-        this.logger.Log(LogLevel.INFO, $"Monitored plan updated for {this.monitoredData.Callsign} as {this.monitoredData.Departure} - {this.monitoredData.Arrival}.");
-      } else
+        this.logger.Log(LogLevel.TRACE, "Active pilot Flight-plan found");
+        fp = pilot.Flight_plan;
+      }
+      else
+      {
+        this.logger.Log(LogLevel.TRACE, $"Looking for flight-plan for {mcid} between prefiles");
+        var prefile = model.Prefiles.FirstOrDefault(q => q.CID == mcid);
+        if (prefile != null)
+        {
+          this.logger.Log(LogLevel.TRACE, "Prefiled Flight-plan found");
+          fp = pilot.Flight_plan;
+          fp.Revision_id = -1;
+        }
+      }
+      if (fp != null)
+      {
+        if (this.monitoredData == null || this.monitoredData.RevisionId < 0 || this.monitoredData.RevisionId != fp.Revision_id)
+        {
+          this.logger.Log(LogLevel.TRACE, "Flight-plan will be updated");
+          this.monitoredData = new MonitoredDataRecord(fp.Departure, fp.Arrival, fp.Revision_id.Value);
+          this.updateTimer.Interval = this.settings.RefreshFlightPlanUpdateInterval * 60 * 1000;
+          this.logger.Log(LogLevel.INFO, $"Monitored plan updated as {this.monitoredData.Departure} - {this.monitoredData.Arrival} (rev {this.monitoredData.RevisionId}).");
+        }
+        else
+        {
+          this.logger.Log(LogLevel.TRACE, "Flight-plan will not be updated");
+        }
+      }
+      else
         this.logger.Log(LogLevel.DEBUG, "No prefile found or update not needed");
     }
 
@@ -108,7 +205,7 @@ namespace VPilotMessageAlert
       Task.Run(InvokeReloadData);
     }
 
-    internal void SetMonitoredVatsimId(string? cid)
+    internal void SetMonitoredVatsimId(string cid)
     {
       this.monitoredVatsimId = cid;
     }
@@ -116,15 +213,23 @@ namespace VPilotMessageAlert
     private async Task<string> DownloadDataAsync()
     {
       var url = this.settings.Sources.GetRandom();
+      this.logger.Log(LogLevel.DEBUG, $"VATSIM source selected: {url}");
       string ret = await DownloadContentAsStringAsync(url);
       return ret;
     }
 
 
-    private static async Task<string> DownloadContentAsStringAsync(string url)
+    private async Task<string> DownloadContentAsStringAsync(string url)
     {
-      using HttpClient httpClient = new();
-      string content = await httpClient.GetStringAsync(url);
+      string content;
+      var uri = new System.Uri(url);
+      this.logger.Log(LogLevel.TRACE, "Opening web-client");
+      using (WebClient webClient = new WebClient())
+      {
+        this.logger.Log(LogLevel.TRACE, "Downloading data... awaiting...");
+        content = await webClient.DownloadStringTaskAsync(uri);
+        this.logger.Log(LogLevel.TRACE, $"Downloading data... completed, got {content.Length} chars.");
+      }
       return content;
     }
   }

@@ -1,22 +1,37 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using VPilotMessageAlert;
 
-Console.WriteLine("Hello, World!");
+namespace VPilotMessageAlertConsoleTestFW
+{
+  internal class Program
+  {
+    static void Main(string[] args)
+    {
+      Console.WriteLine("Hello, World!");
 
-MockBroker broker = new();
+      MockBroker broker = new MockBroker();
 
-VPilotPlugin plugin = new VPilotPlugin();
-plugin.Initialize(broker);
+      VPilotPlugin plugin = new VPilotPlugin();
+      plugin.Initialize(broker);
 
-Console.WriteLine("Broker initialized");
-Thread.Sleep(500);
-Console.WriteLine("Invoking connected");
-broker.InvokeConnected("1666537");
-Thread.Sleep(1000);
-Console.WriteLine("Invoking message");
-broker.InvokeMessage("EZY5495, hello");
-Thread.Sleep(1000);
-Console.WriteLine("Invoking disconnected");
-broker.InvokeDisconnected();
-Thread.Sleep(1000);
-Console.WriteLine("Done");
+      Console.WriteLine("Broker initialized");
+      Thread.Sleep(500);
+      Console.WriteLine("Invoking connected");
+      broker.InvokeConnected("964586");
+      Thread.Sleep(1000);
+      Console.WriteLine("Invoking message");
+      broker.InvokeMessage("EZY5495, hello");
+      Thread.Sleep(1000);
+      Console.WriteLine("Invoking disconnected");
+      broker.InvokeDisconnected();
+      Thread.Sleep(100000);
+      Console.WriteLine("Done");
+
+    }
+  }
+}
