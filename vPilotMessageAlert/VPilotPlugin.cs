@@ -15,7 +15,8 @@ namespace VPilotMessageAlert
     private BrokerProxy? brokerProxy;
     private ELogging.Logger logger = null!;
     private static readonly VPilotMessageAlert.Settings.Root settings = null!;
-    private VatsimData vatsimData = null!;
+    private VatsimDataProvider vatsimDataProvider = null!;
+    private string? connectedCallsign;
 
     static VPilotPlugin()
     {
@@ -26,6 +27,7 @@ namespace VPilotMessageAlert
       {
         settings = provider.Get<VPilotMessageAlert.Settings.Root>() ?? throw new ApplicationException("Configuration returned null.");
         RegisterLog();
+        Logger.Log(typeof(VPilotPlugin), LogLevel.INFO, "Settings loaded");
       }
       catch (Exception ex)
       {
@@ -42,10 +44,20 @@ namespace VPilotMessageAlert
 
     private static void RegisterLog()
     {
+      Logger.RegisterSenderName(typeof(VPilotPlugin), nameof(VPilotPlugin), false);
+      if (System.IO.File.Exists(settings.Logging.FileName))
+        try
+        {
+          System.IO.File.Delete(settings.Logging.FileName);
+        }
+        catch (Exception)
+        {
+          // intentionally blank
+        }
       Logger.RegisterLogAction(
         li =>
         {
-          string s = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {li.Level,-20} {li.SenderName} {li.Message}\n";
+          string s = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {li.Level,-10} {li.SenderName,-20} {li.Message}\n";
           System.IO.File.AppendAllText(settings.Logging.FileName, s);
         },
         new List<LogRule>()
@@ -58,7 +70,7 @@ namespace VPilotMessageAlert
 
     public void Initialize(IBroker broker)
     {
-      this.logger = ELogging.Logger.Create(this);
+      this.logger = ELogging.Logger.Create(this, nameof(VPilotPlugin));
       this.brokerProxy = new(broker);
       PostInitialize();
     }
@@ -83,7 +95,7 @@ namespace VPilotMessageAlert
 
     private void StartVatsimData()
     {
-      this.vatsimData = new(settings.Vatsim);
+      this.vatsimDataProvider = new(settings.Vatsim);
     }
 
     private void Broker_SelcalAlertReceived(object? sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.SelcalAlertReceivedEventArgs e)
@@ -99,7 +111,30 @@ namespace VPilotMessageAlert
       logger.Log(LogLevel.INFO, "RadioMessageReceived");
       var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.RadioMessage);
       logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
-      if (rule != null) TryPlaySound(rule.File);
+      if (rule != null && IsMessageToMonitoredDataMatch(e.Message))
+        TryPlaySound(rule.File);
+    }
+
+    private bool IsMessageToMonitoredDataMatch(string message)
+    {
+      bool ret = false;
+      if (message.Contains(this.connectedCallsign!))
+        ret = true;
+      else
+      {
+        var fd = this.vatsimDataProvider.MonitoredData;
+        if (fd != null)
+        {
+          if (message.Contains(fd.Departure))
+            ret = true;
+          else if (message.Contains(fd.Arrival))
+            ret = true;
+          else if (message.Contains(fd.Callsign))
+            ret = true;
+        }
+      }
+      this.logger.Log(LogLevel.DEBUG, $"Message '{message}' checked with result {ret}");
+      return ret;
     }
 
     private void Broker_NetworkDisconnected(object? sender, EventArgs e)
@@ -113,9 +148,10 @@ namespace VPilotMessageAlert
     private void Broker_NetworkConnected(object? sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.NetworkConnectedEventArgs e)
     {
       logger.Log(LogLevel.INFO, "NetworkConnected");
+      this.connectedCallsign = e.Callsign;
 
-      this.vatsimData.SetMonitoredVatsimId(e.Cid);
-      this.vatsimData.StartDownloading();
+      this.vatsimDataProvider.SetMonitoredVatsimId(e.Cid);
+      this.vatsimDataProvider.StartDownloading();
 
       var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.Connected);
       logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
