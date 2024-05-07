@@ -1,8 +1,8 @@
 ﻿using ELogging;
 using ESystem;
 using ESystem.Asserting;
-using Microsoft.Extensions.Configuration;
 using NAudio.Wave;
+using Newtonsoft.Json;
 using RossCarlson.Vatsim.Vpilot.Plugins;
 using System;
 using System.Collections.Generic;
@@ -25,15 +25,16 @@ namespace VPilotMessageAlert
 
     static VPilotPlugin()
     {
-      var provider = new ConfigurationManager();
+      string configFileName;
       if (System.IO.File.Exists("Plugins\\settings.json"))
-        provider.AddJsonFile("Plugins\\settings.json");
+        configFileName = "Plugins\\settings.json";
       else
-        provider.AddJsonFile("settings.json");
+        configFileName = "settings.json";
 
       try
       {
-        settings = provider.Get<VPilotMessageAlert.Settings.Root>() ?? throw new ApplicationException("Configuration returned null.");
+        string s = System.IO.File.ReadAllText(configFileName);
+        settings = JsonConvert.DeserializeObject<VPilotMessageAlert.Settings.Root>(s);
         RegisterLog();
         Logger.Log(typeof(VPilotPlugin), LogLevel.INFO, "Settings loaded");
       }
