@@ -83,6 +83,7 @@ namespace VPilotMessageAlert
     private readonly System.Timers.Timer updateTimer;
     private readonly Logger logger;
     private string monitoredVatsimId = null;
+    private volatile bool isUpdateInProgress = false;
     private MonitoredDataRecord monitoredData = null;
 
     public VatsimDataProvider(Vatsim settings)
@@ -119,15 +120,14 @@ namespace VPilotMessageAlert
 
     private async Task ReloadDataAsync()
     {
-      this.logger.Log(LogLevel.TRACE, "Entering update monitor");
-      if (!Monitor.TryEnter(this.updateTimer))
+      this.logger.Log(LogLevel.TRACE, "Trying to obtain update flag.");
+      if (!TryGetUpdateLock())
       {
-        this.logger.Log(LogLevel.TRACE, "Entering update monitor -- failed");
-        // lock did not expire, something wrong?
-        this.logger.Log(LogLevel.ERROR, "Update lock did not expire. Too short updating interval or something went wrong during update?");
+        this.logger.Log(LogLevel.ERROR, "Update flag did not expire. Too short updating interval or something went wrong during update?");
         return;
       }
-      this.logger.Log(LogLevel.TRACE, "Entering update monitor -- success");
+
+      this.logger.Log(LogLevel.TRACE, "Entering update flag -- success");
       this.logger.Log(LogLevel.INFO, "Reloading VATSIM data");
 
       try
@@ -142,11 +142,36 @@ namespace VPilotMessageAlert
       }
       finally
       {
-        this.logger.Log(LogLevel.TRACE, "Exiting update monitor");
-        Monitor.Exit(this.updateTimer);
+        this.logger.Log(LogLevel.TRACE, "Exiting update flag.");
+        ReleaseUpdateLock();
       }
 
       this.logger.Log(LogLevel.INFO, "Reloading VATSIM data -- completed.");
+    }
+
+    private void ReleaseUpdateLock()
+    {
+      lock (this.updateTimer)
+      {
+        this.isUpdateInProgress = false;
+      }
+    }
+
+    private bool TryGetUpdateLock()
+    {
+      bool canContinue;
+      lock (this.updateTimer)
+      {
+        if (isUpdateInProgress)
+          canContinue = false;
+        else
+        {
+          canContinue = true;
+          isUpdateInProgress = true;
+        }
+      }
+
+      return canContinue;
     }
 
     private void UpdateUserData(string data)
@@ -176,7 +201,7 @@ namespace VPilotMessageAlert
         if (prefile != null)
         {
           this.logger.Log(LogLevel.TRACE, "Prefiled Flight-plan found");
-          fp = pilot.Flight_plan;
+          fp = prefile.Flight_plan;
           fp.Revision_id = -1;
         }
       }

@@ -23,6 +23,7 @@ namespace VPilotMessageAlert
     private VatsimDataProvider vatsimDataProvider = null;
     private string connectedCallsign;
     private const string DEFAULT_LOG_FILE_NAME = "_log.txt";
+    private static readonly bool isPluginMode = System.IO.Directory.Exists("Plugins");
 
     static VPilotPlugin()
     {
@@ -45,7 +46,8 @@ namespace VPilotMessageAlert
 
     private static void RegisterLogInitially()
     {
-      RegisterLog(LogLevel.TRACE, DEFAULT_LOG_FILE_NAME, true);
+      string logFileName = isPluginMode ? System.IO.Path.Combine("Plugins", DEFAULT_LOG_FILE_NAME) : DEFAULT_LOG_FILE_NAME;
+      RegisterLog(LogLevel.TRACE, logFileName, true);
     }
 
     private static void RegisterLogBySettings()

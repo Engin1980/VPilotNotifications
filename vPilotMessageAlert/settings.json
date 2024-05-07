@@ -1,6 +1,6 @@
 {
   "Logging": {
-    "Level": "DEBUG",
+    "Level": "TRACE",
     "FileName": "_log.txt"
   },
   "Events": [

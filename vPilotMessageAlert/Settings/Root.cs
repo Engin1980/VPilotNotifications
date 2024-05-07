@@ -72,6 +72,7 @@ namespace VPilotMessageAlert.Settings
 
     private void AdjustPaths()
     {
+      if (this.Logging.FileName != null) this.Logging.FileName = System.IO.Path.Combine("Plugins", this.Logging.FileName);
       foreach (var evt in this.Events.Where(q => q.File != null && q.File.Name != null))
       {
         evt.File.Name = System.IO.Path.Combine("Plugins", evt.File.Name);

@@ -26,10 +26,10 @@ namespace VPilotMessageAlertConsoleTestFW
       Thread.Sleep(1000);
       Console.WriteLine("Invoking message");
       broker.InvokeMessage("EZY5495, hello");
-      Thread.Sleep(1000);
+      Thread.Sleep(100000);
       Console.WriteLine("Invoking disconnected");
       broker.InvokeDisconnected();
-      Thread.Sleep(5000);
+      Thread.Sleep(500000);
       Console.WriteLine("Done");
 
     }
