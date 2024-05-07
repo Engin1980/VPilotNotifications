@@ -1,6 +1,6 @@
 {
   "Logging": {
-    "Level": "TRACE",
+    "Level": "DEBUG",
     "FileName": "_log.txt"
   },
   "Events": [
@@ -21,7 +21,7 @@
     {
       "Action": "RadioMessage",
       "File": {
-        "Name": "C:\\Windows\\WinSxS\\amd64_microsoft-windows-ie-internetexplorer_31bf3856ad364e35_11.0.19041.3758_none_e7a8add7f8ce0ec9\\Windows Pop-up Blocked.wav",
+        "Name": "Sounds\\bell.mp3",
         "Volume": 1
       }
     }

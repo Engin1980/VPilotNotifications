@@ -87,7 +87,12 @@
     <Compile Include="BrokerProxy.cs" />
     <Compile Include="MockBroker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Settings\Event.cs" />
+    <Compile Include="Settings\EventAction.cs" />
+    <Compile Include="Settings\File.cs" />
+    <Compile Include="Settings\Logging.cs" />
+    <Compile Include="Settings\Root.cs" />
+    <Compile Include="Settings\Vatsim.cs" />
     <Compile Include="VatsimDataProvider.cs" />
     <Compile Include="VPilotPlugin.cs" />
   </ItemGroup>
@@ -107,6 +112,12 @@
       <Project>{fedf12c8-7fbd-496b-9d02-2e59c32aa95a}</Project>
       <Name>ESystem472</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Sounds\bell.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

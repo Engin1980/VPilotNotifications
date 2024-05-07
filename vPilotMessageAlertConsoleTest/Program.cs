@@ -29,7 +29,7 @@ namespace VPilotMessageAlertConsoleTestFW
       Thread.Sleep(1000);
       Console.WriteLine("Invoking disconnected");
       broker.InvokeDisconnected();
-      Thread.Sleep(100000);
+      Thread.Sleep(5000);
       Console.WriteLine("Done");
 
     }

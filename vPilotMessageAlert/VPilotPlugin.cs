@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using VPilotMessageAlert;
+using VPilotMessageAlert.Settings;
 
 namespace VPilotMessageAlert
 {
@@ -21,102 +22,98 @@ namespace VPilotMessageAlert
     private static readonly VPilotMessageAlert.Settings.Root settings = null;
     private VatsimDataProvider vatsimDataProvider = null;
     private string connectedCallsign;
-    private static bool isReadyForPostInitialize = false;
+    private const string DEFAULT_LOG_FILE_NAME = "_log.txt";
 
     static VPilotPlugin()
     {
-      string configFileName;
-      if (System.IO.File.Exists("Plugins\\settings.json"))
-        configFileName = "Plugins\\settings.json";
-      else
-        configFileName = "settings.json";
+      RegisterLogInitially();
 
       try
       {
-        string s = System.IO.File.ReadAllText(configFileName);
-        settings = JsonConvert.DeserializeObject<VPilotMessageAlert.Settings.Root>(s);
-        RegisterLog();
-        Logger.Log(typeof(VPilotPlugin), LogLevel.INFO, "Settings loaded");
+        settings = Settings.Root.Load();
       }
       catch (Exception ex)
       {
-        VPilotPlugin.settings = GetDefaultSettings();
-        RegisterLog();
         Logger.Log(typeof(VPilotPlugin), LogLevel.WARNING, $"Failed to load settings from file 'settings.json'. Reason: {ex.GetFullMessage()}");
+        settings = null;
+        return;
       }
-      EAssert.IsNotNull(VPilotPlugin.settings);
-      if (settings.Events.Count == 0)
-        Logger.Log(typeof(VPilotPlugin), LogLevel.WARNING, "No events are monitored. Update configuration file.");
 
-      //TODO add file-exist validation
-      Logger.Log(typeof(VPilotPlugin), LogLevel.TRACE, "Setting ready for postInitialize");
-      isReadyForPostInitialize = true;
+      RegisterLogBySettings();
+
     }
 
-    private static void RegisterLog()
+    private static void RegisterLogInitially()
+    {
+      RegisterLog(LogLevel.TRACE, DEFAULT_LOG_FILE_NAME, true);
+    }
+
+    private static void RegisterLogBySettings()
+    {
+      RegisterLog(settings.Logging.Level, settings.Logging.FileName, settings.Logging.FileName != DEFAULT_LOG_FILE_NAME);
+    }
+
+
+    private static void RegisterLog(LogLevel level, string fileName, bool deleteFileFirst)
     {
       Logger.RegisterSenderName(typeof(VPilotPlugin), nameof(VPilotPlugin), false);
-      if (System.IO.File.Exists(settings.Logging.FileName))
+      if (deleteFileFirst && System.IO.File.Exists(fileName))
         try
         {
-          System.IO.File.Delete(settings.Logging.FileName);
+          System.IO.File.Delete(fileName);
         }
         catch (Exception)
         {
           // intentionally blank
         }
+
+      Logger.UnregisterLogAction(owner: typeof(VPilotPlugin));
+
       Logger.RegisterLogAction(
         li =>
         {
           string s = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {li.Level,-10} {li.SenderName,-20} {li.Message}\n";
           lock (typeof(VPilotPlugin))
           {
-            System.IO.File.AppendAllText(settings.Logging.FileName, s);
+            System.IO.File.AppendAllText(fileName, s);
           }
         },
         new List<LogRule>()
         {
-          new LogRule(".+", settings.Logging.Level)
-        });
+          new LogRule(".+", level)
+        },
+        owner: typeof(VPilotPlugin));
     }
 
     private static VPilotMessageAlert.Settings.Root GetDefaultSettings() => new Settings.Root(new Settings.Logging("_log.txt", ELogging.LogLevel.DEBUG));
 
     public void Initialize(IBroker broker)
     {
-      this.logger = ELogging.Logger.Create(this, nameof(VPilotPlugin));
       this.brokerProxy = new BrokerProxy(broker);
-
       PostInitialize();
     }
 
     public void Initialize(MockBroker broker)
     {
-      this.logger = ELogging.Logger.Create(this);
       this.brokerProxy = new BrokerProxy(broker);
       PostInitialize();
     }
 
     public void PostInitialize()
     {
-      while (!isReadyForPostInitialize)
+      if (settings == null)
       {
-        this.logger.Log(LogLevel.TRACE, "Not ready for postInitialize");
-        Thread.Sleep(2500);
+        Logger.Log(nameof(VPilotPlugin), LogLevel.CRITICAL, "Settings were not loaded. Plugin is disabled.");
+        return;
       }
-      this.logger.Log(LogLevel.TRACE, "Post initializing");
 
-      EAssert.IsNotNull(this.brokerProxy);
+      this.logger = Logger.Create(this);
+
       this.brokerProxy.NetworkConnected += Broker_NetworkConnected;
       this.brokerProxy.NetworkDisconnected += Broker_NetworkDisconnected;
       this.brokerProxy.RadioMessageReceived += Broker_RadioMessageReceived;
       this.brokerProxy.SelcalAlertReceived += Broker_SelcalAlertReceived;
 
-      StartVatsimData();
-    }
-
-    private void StartVatsimData()
-    {
       this.vatsimDataProvider = new VatsimDataProvider(settings.Vatsim);
     }
 
