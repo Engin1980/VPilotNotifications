@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>VPilotMessageAlertConsoleTestFW</RootNamespace>
-    <AssemblyName>VPilotMessageAlertConsoleTestFW</AssemblyName>
+    <RootNamespace>VPilotMessageAlertConsoleTest</RootNamespace>
+    <AssemblyName>VPilotMessageAlertConsoleTest</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

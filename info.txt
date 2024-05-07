@@ -1,2 +1,50 @@
 https://vpilot.rosscarlson.dev/PluginInstructions.txt
 Https://www.Vatir.Ir/vatsimdata.Txt
+
+
+
+-- assembly resolving
+
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <probing privatePath="TradeWright.TradeBuild.ComInterop" />
+    </assemblyBinding>
+
+
+
+  <Target Name="AfterBuild">
+    <ItemGroup>
+      <FilesToMove Include="$(OutDir)ELogging472.dll" />
+      <FilesToMove Include="$(OutDir)ELogging472.pdb" />
+      <FilesToMove Include="$(OutDir)ESystem472.dll" />
+      <FilesToMove Include="$(OutDir)ESystem472.pdb" />
+      <FilesToMove Include="$(OutDir)Microsoft.Win32.Registry.dll" />
+      <FilesToMove Include="$(OutDir)Microsoft.Win32.Registry.xml" />
+      <FilesToMove Include="$(OutDir)NAudio.Asio.dll" />
+      <FilesToMove Include="$(OutDir)NAudio.Asio.xml" />
+      <FilesToMove Include="$(OutDir)NAudio.Core.dll" />
+      <FilesToMove Include="$(OutDir)NAudio.Core.xml" />
+      <FilesToMove Include="$(OutDir)NAudio.dll" />
+      <FilesToMove Include="$(OutDir)NAudio.Midi.dll" />
+      <FilesToMove Include="$(OutDir)NAudio.Midi.xml" />
+      <FilesToMove Include="$(OutDir)NAudio.Wasapi.dll" />
+      <FilesToMove Include="$(OutDir)NAudio.Wasapi.xml" />
+      <FilesToMove Include="$(OutDir)NAudio.WinForms.dll" />
+      <FilesToMove Include="$(OutDir)NAudio.WinForms.xml" />
+      <FilesToMove Include="$(OutDir)NAudio.WinMM.dll" />
+      <FilesToMove Include="$(OutDir)NAudio.WinMM.xml" />
+      <FilesToMove Include="$(OutDir)NAudio.xml" />
+      <FilesToMove Include="$(OutDir)Newtonsoft.Json.dll" />
+      <FilesToMove Include="$(OutDir)Newtonsoft.Json.xml" />
+      <FilesToMove Include="$(OutDir)settings.json" />
+      <FilesToMove Include="$(OutDir)System.Buffers.dll" />
+      <FilesToMove Include="$(OutDir)System.Buffers.xml" />
+      <FilesToMove Include="$(OutDir)System.Numerics.Vectors.dll" />
+      <FilesToMove Include="$(OutDir)System.Numerics.Vectors.xml" />
+      <FilesToMove Include="$(OutDir)System.Security.AccessControl.dll" />
+      <FilesToMove Include="$(OutDir)System.Security.AccessControl.xml" />
+      <FilesToMove Include="$(OutDir)System.Security.Principal.Windows.dll" />
+      <FilesToMove Include="$(OutDir)System.Security.Principal.Windows.xml" />
+    </ItemGroup>
+    <Move SourceFiles="@(FilesToMove)" DestinationFolder="$(OutDir)Libs" />
+  </Target>
