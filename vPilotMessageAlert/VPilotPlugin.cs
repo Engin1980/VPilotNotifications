@@ -138,6 +138,7 @@ namespace VPilotMessageAlert
 
     private bool IsMessageToMonitoredDataMatch(string message)
     {
+      message = message.ToUpper();
       bool ret = false;
       if (message.Contains(this.connectedCallsign))
         ret = true;
