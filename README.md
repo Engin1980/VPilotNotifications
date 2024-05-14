@@ -1,5 +1,7 @@
 A simple tool playing sound when your callsign, departure or destination airport is mentioned in [VPilot](https://vpilot.rosscarlson.dev/) communication messages.
 
+**Why** Cos I made an airprox with KLM1277 at EGPH, moreover occusing him for not using UNICOM. I overlooked the message in the mess of other chatting. My big apologies.
+
 # Installation
 
 VPilot must be installed prior the plugin installation.
