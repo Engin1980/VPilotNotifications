@@ -3,6 +3,7 @@ using RossCarlson.Vatsim.Vpilot.Plugins;
 using RossCarlson.Vatsim.Vpilot.Plugins.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -58,6 +59,17 @@ namespace VPilotMessageAlert
     }
 
     #endregion Public Constructors
+
+    #region Public Methods
+
+    public void SendPrivateMessage(string target, string message)
+    {
+      if (this.mock != null)
+        Console.WriteLine(message);
+      else if (this.vpilot != null)
+        this.vpilot.SendPrivateMessage(target, message);
+    }
+    #endregion
 
     #region Private Methods
 

@@ -26,6 +26,8 @@ namespace VPilotMessageAlert.Settings
     public List<Event> Events { get; set; } = new List<Event>();
     public Logging Logging { get; set; } = new Logging();
     public Vatsim Vatsim { get; set; } = new Vatsim();
+    public Behavior Behavior { get; set; } = new Behavior();
+
     internal static Root Load()
     {
       // No usage of logging here! Log not ready yet!

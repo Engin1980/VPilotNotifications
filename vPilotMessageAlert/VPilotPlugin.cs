@@ -16,6 +16,8 @@ namespace VPilotMessageAlert
 {
   public class VPilotPlugin : RossCarlson.Vatsim.Vpilot.Plugins.IPlugin
   {
+    private const string CONNECTED_INFO_PRIVATE_MESSAGE = "VPilotMessageAlert plugin loaded and active";
+
     public string Name => "VPilotMessageAlert";
     private BrokerProxy brokerProxy;
     private ELogging.Logger logger = null;
@@ -41,7 +43,6 @@ namespace VPilotMessageAlert
       }
 
       RegisterLogBySettings();
-
     }
 
     private static void RegisterLogInitially()
@@ -117,6 +118,7 @@ namespace VPilotMessageAlert
       this.brokerProxy.SelcalAlertReceived += Broker_SelcalAlertReceived;
 
       this.vatsimDataProvider = new VatsimDataProvider(settings.Vatsim);
+      Logger.Log(nameof(VPilotPlugin), LogLevel.INFO, "Plugin seems to be loaded and running.");
     }
 
     private void Broker_SelcalAlertReceived(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.SelcalAlertReceivedEventArgs e)
@@ -175,7 +177,17 @@ namespace VPilotMessageAlert
 
       var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.Connected);
       logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
+      SendPrivateMessageOnFirstConnectionIfRequired();
       if (rule != null) TryPlaySound(rule.File);
+    }
+
+    private void SendPrivateMessageOnFirstConnectionIfRequired()
+    {
+      if (VPilotPlugin.settings.Behavior.SendPrivateMessageWhenConnectedForTheFirstTime)
+      {
+        this.brokerProxy.SendPrivateMessage(this.connectedCallsign, CONNECTED_INFO_PRIVATE_MESSAGE);
+        VPilotPlugin.settings.Behavior.SendPrivateMessageWhenConnectedForTheFirstTime = false;
+      };      
     }
 
     private void TryPlaySound(Settings.File file)
