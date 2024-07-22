@@ -7,14 +7,14 @@
     {
       "Action": "Connected",
       "File": {
-        "Name": "C:\\Windows\\WinSxS\\amd64_microsoft-windows-speech-userexperience_31bf3856ad364e35_10.0.19041.3636_none_90a186cf012113f2\\Speech On.wav",
+        "Name": "Sounds\\connected.mp3",
         "Volume": 1
       }
     },
     {
       "Action": "Disconnected",
       "File": {
-        "Name": "C:\\Windows\\WinSxS\\amd64_microsoft-windows-speech-userexperience_31bf3856ad364e35_10.0.19041.3636_none_90a186cf012113f2\\Speech Off.wav",
+        "Name": "Sounds\\disconnected.mp3",
         "Volume": 1
       }
     },
