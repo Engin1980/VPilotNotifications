@@ -70,7 +70,7 @@ namespace VPilotMessageAlert
       else if (this.vpilot != null)
       {
         if (isConnected)
-          this.vpilot.SendPrivateMessage("VPilotMessageAlert", message);
+          this.vpilot.SendPrivateMessage("VPilotMsgAlert", message);
       }
     }
     #endregion
