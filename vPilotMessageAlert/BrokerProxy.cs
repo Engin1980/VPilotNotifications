@@ -29,6 +29,7 @@ namespace VPilotMessageAlert
 
     private readonly MockBroker mock;
     private readonly IBroker vpilot;
+    private bool isConnected = false;
 
     #endregion Private Fields
 
@@ -62,12 +63,15 @@ namespace VPilotMessageAlert
 
     #region Public Methods
 
-    public void SendPrivateMessage(string target, string message)
+    public void SendPrivateMessage(string message)
     {
       if (this.mock != null)
         Console.WriteLine(message);
       else if (this.vpilot != null)
-        this.vpilot.SendPrivateMessage(target, message);
+      {
+        if (isConnected)
+          this.vpilot.SendPrivateMessage("VPilotMessageAlert", message);
+      }
     }
     #endregion
 
@@ -75,11 +79,13 @@ namespace VPilotMessageAlert
 
     private void Broker_NetworkConnected(object sender, NetworkConnectedEventArgs e)
     {
+      this.isConnected = true;
       this.NetworkConnected?.Invoke(this, e);
     }
 
     private void Broker_NetworkDisconnected(object sender, EventArgs e)
     {
+      this.isConnected = false;
       this.NetworkDisconnected?.Invoke(this, e);
     }
 

@@ -85,6 +85,7 @@ namespace VPilotMessageAlert
     private string monitoredVatsimId = null;
     private volatile bool isUpdateInProgress = false;
     private MonitoredDataRecord monitoredData = null;
+    public event Action<MonitoredDataRecord> FlightPlanUpdateProcessed;
 
     public VatsimDataProvider(Vatsim settings)
     {
@@ -133,7 +134,8 @@ namespace VPilotMessageAlert
       try
       {
         var data = await DownloadDataAsync();
-        UpdateUserData(data);
+        UpdateUserData(data, out bool changed);
+        if (changed) FlightPlanUpdateProcessed?.Invoke(this.MonitoredData);
       }
       catch (Exception ex)
       {
@@ -174,9 +176,10 @@ namespace VPilotMessageAlert
       return canContinue;
     }
 
-    private void UpdateUserData(string data)
+    private void UpdateUserData(string data, out bool flightPlanUpdated)
     {
       this.logger.Log(LogLevel.TRACE, "Deserializing data");
+      flightPlanUpdated = false;
       Model model = JsonConvert.DeserializeObject<Model>(data);
       this.logger.Log(LogLevel.TRACE, "Data deserialized.");
       if (model == null)
@@ -213,6 +216,7 @@ namespace VPilotMessageAlert
           this.monitoredData = new MonitoredDataRecord(fp.Departure, fp.Arrival, fp.Revision_id.Value);
           this.updateTimer.Interval = this.settings.RefreshFlightPlanUpdateInterval * 60 * 1000;
           this.logger.Log(LogLevel.INFO, $"Monitored plan updated as {this.monitoredData.Departure} - {this.monitoredData.Arrival} (rev {this.monitoredData.RevisionId}).");
+          flightPlanUpdated = true;
         }
         else
         {

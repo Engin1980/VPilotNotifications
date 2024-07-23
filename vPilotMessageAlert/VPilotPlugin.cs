@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Timers;
 using VPilotMessageAlert;
 using VPilotMessageAlert.Settings;
 
@@ -16,7 +17,7 @@ namespace VPilotMessageAlert
 {
   public class VPilotPlugin : RossCarlson.Vatsim.Vpilot.Plugins.IPlugin
   {
-    private const string CONNECTED_INFO_PRIVATE_MESSAGE = "VPilotMessageAlert plugin loaded and active";
+    private const string CONNECTED_INFO_PRIVATE_MESSAGE = "Plugin loaded and active";
 
     public string Name => "VPilotMessageAlert";
     private BrokerProxy brokerProxy;
@@ -26,6 +27,12 @@ namespace VPilotMessageAlert
     private string connectedCallsign;
     private const string DEFAULT_LOG_FILE_NAME = "_log.txt";
     private static readonly bool isPluginMode = System.IO.Directory.Exists("Plugins");
+    private System.Timers.Timer disconnectedRepeatTimer;
+    private Action disconnectedPlaySoundAction;
+    private Action connectedPlaySoundAction;
+    private Action radioMessagePlaySoundAction;
+    private Action selcalAlertSoundAction;
+    private Action systemAlertSoundAction;
 
     static VPilotPlugin()
     {
@@ -117,25 +124,95 @@ namespace VPilotMessageAlert
       this.brokerProxy.RadioMessageReceived += Broker_RadioMessageReceived;
       this.brokerProxy.SelcalAlertReceived += Broker_SelcalAlertReceived;
 
+      SetUpDisconnectedTimer(settings.Behavior);
+      SetUpActions();
       this.vatsimDataProvider = new VatsimDataProvider(settings.Vatsim);
+      this.vatsimDataProvider.FlightPlanUpdateProcessed += VatsimDataProvider_FlightPlanUpdateProcessed;
+
       Logger.Log(nameof(VPilotPlugin), LogLevel.INFO, "Plugin seems to be loaded and running.");
+    }
+
+    private void VatsimDataProvider_FlightPlanUpdateProcessed(VatsimDataProvider.MonitoredDataRecord flightPlanInfo)
+    {
+      if (settings.Behavior.SendPrivateMessageWhenFlightPlanDetected && this.connectedCallsign != null)
+      {
+        this.brokerProxy.SendPrivateMessage($"Flight plan update: {flightPlanInfo.Departure} -> {flightPlanInfo.Arrival}.");
+        systemAlertSoundAction?.Invoke();
+      }
+    }
+
+    private void SetUpActions()
+    {
+      {
+        logger.Log(LogLevel.INFO, "Setting up SystemAlert-Action");
+        var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.SystemAlert);
+        logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
+        if (rule != null)
+          this.systemAlertSoundAction = () => TryPlaySound(rule.File);
+      }
+      {
+        logger.Log(LogLevel.INFO, "Setting up SelCalAlert-Action");
+        var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.SelcalAlert);
+        logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
+        if (rule != null)
+          this.selcalAlertSoundAction = () => TryPlaySound(rule.File);
+      }
+      {
+        logger.Log(LogLevel.INFO, "Setting up Message-Action");
+        var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.RadioMessage);
+        logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
+        if (rule != null)
+          this.radioMessagePlaySoundAction = () => TryPlaySound(rule.File);
+      }
+      {
+        logger.Log(LogLevel.INFO, "Setting up NetworkDisconnected-Action");
+        var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.Disconnected);
+        logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
+        if (rule != null)
+          this.disconnectedPlaySoundAction = () => TryPlaySound(rule.File);
+      }
+      {
+        logger.Log(LogLevel.INFO, "Setting up NetworkConnected-Action");
+        var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.Connected);
+        logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
+        if (rule != null)
+          this.connectedPlaySoundAction = () => TryPlaySound(rule.File);
+      }
+    }
+
+    private void SetUpDisconnectedTimer(Behavior behavior)
+    {
+      if (behavior.RepeatAlertIntervalWhenDisconnected <= 0)
+      {
+        this.disconnectedRepeatTimer = null;
+      }
+      else
+      {
+        this.disconnectedRepeatTimer = new System.Timers.Timer(behavior.RepeatAlertIntervalWhenDisconnected * 1000)
+        {
+          AutoReset = true,
+          Enabled = false
+        };
+        this.disconnectedRepeatTimer.Elapsed += DisconnectedRepeatTimer_Elapsed;
+      }
+    }
+
+    private void DisconnectedRepeatTimer_Elapsed(object sender, ElapsedEventArgs e)
+    {
+      this.disconnectedPlaySoundAction();
     }
 
     private void Broker_SelcalAlertReceived(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.SelcalAlertReceivedEventArgs e)
     {
       logger.Log(LogLevel.INFO, "SelcalAlertReceived");
-      var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.SelcalAlert);
-      logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
-      if (rule != null) TryPlaySound(rule.File);
+      selcalAlertSoundAction?.Invoke();
     }
 
     private void Broker_RadioMessageReceived(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.RadioMessageReceivedEventArgs e)
     {
       logger.Log(LogLevel.INFO, "RadioMessageReceived");
-      var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.RadioMessage);
-      logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
-      if (rule != null && IsMessageToMonitoredDataMatch(e.Message))
-        TryPlaySound(rule.File);
+      if (radioMessagePlaySoundAction != null && IsMessageToMonitoredDataMatch(e.Message))
+        radioMessagePlaySoundAction();
     }
 
     private bool IsMessageToMonitoredDataMatch(string message)
@@ -162,32 +239,38 @@ namespace VPilotMessageAlert
     private void Broker_NetworkDisconnected(object sender, EventArgs e)
     {
       logger.Log(LogLevel.INFO, "NetworkDisconnected");
-      var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.Disconnected);
-      logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
-      if (rule != null) TryPlaySound(rule.File);
+      this.connectedCallsign = null;
+
+      if (disconnectedPlaySoundAction != null)
+      {
+        disconnectedPlaySoundAction();
+        if (disconnectedRepeatTimer != null)
+          disconnectedRepeatTimer.Enabled = true;
+      }
     }
 
     private void Broker_NetworkConnected(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.NetworkConnectedEventArgs e)
     {
       logger.Log(LogLevel.INFO, "NetworkConnected");
+      this.disconnectedRepeatTimer.Enabled = false;
+
       this.connectedCallsign = e.Callsign;
 
       this.vatsimDataProvider.SetMonitoredVatsimId(e.Cid);
       this.vatsimDataProvider.StartDownloading();
 
-      var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.Connected);
-      logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
       SendPrivateMessageOnFirstConnectionIfRequired();
-      if (rule != null) TryPlaySound(rule.File);
+      connectedPlaySoundAction?.Invoke();
     }
 
     private void SendPrivateMessageOnFirstConnectionIfRequired()
     {
       if (VPilotPlugin.settings.Behavior.SendPrivateMessageWhenConnectedForTheFirstTime)
       {
-        this.brokerProxy.SendPrivateMessage(this.connectedCallsign, CONNECTED_INFO_PRIVATE_MESSAGE);
+        this.brokerProxy.SendPrivateMessage(CONNECTED_INFO_PRIVATE_MESSAGE);
+        systemAlertSoundAction?.Invoke();
         VPilotPlugin.settings.Behavior.SendPrivateMessageWhenConnectedForTheFirstTime = false;
-      };      
+      };
     }
 
     private void TryPlaySound(Settings.File file)

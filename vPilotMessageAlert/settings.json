@@ -5,6 +5,20 @@
   },
   "Events": [
     {
+      "Action": "SystemAlert",
+      "File": {
+        "Name": "Sounds\\selcal.mp3",
+        "Volume": 1
+      }
+    },
+    {
+      "Action": "SelCalAlert",
+      "File": {
+        "Name": "Sounds\\selcal.mp3",
+        "Volume": 1
+      }
+    },
+    {
       "Action": "Connected",
       "File": {
         "Name": "Sounds\\connected.mp3",
@@ -32,6 +46,8 @@
     "RefreshFlightPlanUpdateInterval": 10
   },
   "Behavior": {
-    "SendPrivateMessageWhenConnectedForTheFirstTime":  true
+    "SendPrivateMessageWhenConnectedForTheFirstTime": true,
+    "SendPrivateMessageWhenFlightPlanDetected": true,
+    "RepeatAlertIntervalWhenDisconnected":  10
   }
 }
