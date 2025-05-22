@@ -1,0 +1,65 @@
+{
+  "Logging": {
+    "Level": "TRACE",
+    "FileName": "_log.txt"
+  },
+  "Events": [
+    {
+      "Action": "SystemAlert",
+      "File": {
+        "Name": "Sounds\\selcal.mp3",
+        "Volume": 1
+      }
+    },
+    {
+      "Action": "SelCalAlert",
+      "File": {
+        "Name": "Sounds\\selcal.mp3",
+        "Volume": 1
+      }
+    },
+    {
+      "Action": "Connected",
+      "File": {
+        "Name": "Sounds\\connected.mp3",
+        "Volume": 1
+      }
+    },
+    {
+      "Action": "Disconnected",
+      "File": {
+        "Name": "Sounds\\disconnected.mp3",
+        "Volume": 1
+      }
+    },
+    {
+      "Action": "RadioMessage",
+      "File": {
+        "Name": "Sounds\\bell.mp3",
+        "Volume": 1
+      }
+    },
+    {
+      "Action": "ContactMeReminder",
+      "File": {
+        "Name": "Sounds\\ring.mp3",
+        "Volume": 1
+      }
+    }
+  ],
+  "Vatsim": {
+    "Sources": [ "https://data.vatsim.net/v3/vatsim-data.json" ],
+    "NoFlightPlanUpdateInterval": 2,
+    "RefreshFlightPlanUpdateInterval": 10
+  },
+  "Behavior": {
+    "SendPrivateMessageWhenConnectedForTheFirstTime": true,
+    "SendPrivateMessageWhenFlightPlanDetected": true,
+    "RepeatAlertIntervalWhenDisconnected": 10,
+    "ContactMeBehavior": {
+      "Enabled": true,
+      "FrequencyRegex": "^Contact me.+(1\\d{2}[\\\\.,]\\d+)$",
+      "RepeatSoundInterval": 30
+    }
+  }
+}
