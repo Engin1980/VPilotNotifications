@@ -1,0 +1,213 @@
+﻿using ESystem.Asserting;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Pipes;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Policy;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace VPilotNetCoreBridge
+{
+  internal class ServerProxy : IDisposable
+  {
+    private readonly string pipePrefix;
+    private readonly CancellationTokenSource methodListeningTaskCancelationTokenSource = new CancellationTokenSource();
+    private readonly Task methodListeningTask;
+    private readonly IBroker broker;
+
+    private readonly static Dictionary<string, Action<IBroker, Dictionary<string, object>>> incomingMethodHandlers;
+
+    static ServerProxy()
+    {
+      incomingMethodHandlers = new Dictionary<string, Action<IBroker, Dictionary<string, object>>>();
+
+      incomingMethodHandlers[nameof(IBroker.RequestDisconnect)] = (broker, args) =>
+      {
+        broker.RequestDisconnect();
+      };
+
+      incomingMethodHandlers[nameof(IBroker.SendPrivateMessage)] = (broker, args) =>
+      {
+        string to = (string)args["to"];
+        string message = (string)args["message"];
+        broker.SendPrivateMessage(to, message);
+      };
+
+      incomingMethodHandlers[nameof(IBroker.PostDebugMessage)] = (broker, args) =>
+      {
+        string message = (string)args["message"];
+        broker.PostDebugMessage(message);
+      };
+
+      incomingMethodHandlers[nameof(IBroker.RequestAtis)] = (broker, args) =>
+      {
+        string callsign = (string)args["callsign"];
+        broker.RequestAtis(callsign);
+      };
+
+      incomingMethodHandlers[nameof(IBroker.RequestConnect)] = (broker, args) =>
+      {
+        broker.RequestConnect(
+          (string)args["callsign"],
+          (string)args["typeCode"],
+          (string)args["selcalCode"]
+        );
+      };
+
+      incomingMethodHandlers[nameof(IBroker.RequestMetar)] = (broker, args) =>
+      {
+        string station = (string)args["station"];
+        broker.RequestMetar(station);
+      };
+
+      incomingMethodHandlers[nameof(IBroker.SendRadioMessage)] = (broker, args) =>
+      {
+        string message = (string)args["message"];
+        broker.SendRadioMessage(message);
+      };
+
+      incomingMethodHandlers[nameof(IBroker.SetModeC)] = (broker, args) =>
+      {
+        bool modeC = (bool)args["modeC"];
+        broker.SetModeC(modeC);
+      };
+
+      incomingMethodHandlers[nameof(IBroker.SquawkIdent)] = (broker, args) =>
+      {
+        broker.SquawkIdent();
+      };
+
+      incomingMethodHandlers[nameof(IBroker.SetPtt)] = (broker, args) =>
+      {
+        bool pressed = (bool)args["pressed"];
+        broker.SetPtt(pressed);
+      };
+
+      incomingMethodHandlers[nameof(IBroker.RequestDisconnect)] = (broker, args) =>
+      {
+        broker.RequestDisconnect();
+      };
+
+      incomingMethodHandlers[nameof(IBroker.RequestDisconnect)] = (broker, args) =>
+      {
+        broker.RequestDisconnect();
+      };
+
+      incomingMethodHandlers[nameof(IBroker.SendPrivateMessage)] = (broker, args) =>
+      {
+        string to = (string)args["to"];
+        string message = (string)args["message"];
+        broker.SendPrivateMessage(to, message);
+      };
+
+
+      // check everything is registered
+      var methods = typeof(IBroker)
+        .GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
+        .Select(q => q.Name)
+        .Where(q=>q.Contains("_") == false)
+        .ToList();
+      methods.Remove("ToString");
+      methods.Remove("GetHashCode");
+      methods.RemoveAll(q => incomingMethodHandlers.ContainsKey(q));
+      EAssert.IsTrue(methods.Count == 0, $"Missing handlers for methods: {string.Join(", ", methods)}");
+    }
+
+    public ServerProxy(string pipePrefix, IBroker broker)
+    {
+      this.pipePrefix = pipePrefix;
+      this.broker = broker;
+      this.methodListeningTask = Task.Run(() => ListenForMethods(methodListeningTaskCancelationTokenSource.Token));
+      RegisterEventListeners();
+    }
+
+    private async Task ListenForMethods(CancellationToken token)
+    {
+      while (!token.IsCancellationRequested)
+      {
+        try
+        {
+          string pipeName = this.pipePrefix + "ProxyMethodPipe";
+          using (var pipe = new NamedPipeServerStream(pipeName))
+          {
+            await pipe.WaitForConnectionAsync(token);
+
+            string json;
+            using (var reader = new StreamReader(pipe, Encoding.UTF8))
+            {
+              json = await reader.ReadToEndAsync();
+            }
+
+            var evt = JsonConvert.DeserializeObject<ProxyMessage>(json);
+            EAssert.IsTrue(evt != null, "evt is null");
+            EAssert.IsTrue(evt.Type == ProxyMessage.METHOD_CALL, "evt.Type is not METHOD_CALL");
+            EAssert.IsTrue(incomingMethodHandlers.TryGetValue(evt.Method, out var handler), $"No handler for method {evt.Method}");
+            handler.Invoke(broker, evt.Args);
+          }
+        }
+        catch (OperationCanceledException ex)
+        {
+          // Expected on shutdown
+          break;
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"Method listener error: {ex.Message}");
+          await Task.Delay(1000, token); // prevent tight loop on error
+        }
+      }
+    }
+
+    private void RegisterEventListeners()
+    {
+      this.broker.AircraftAdded += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftAdded), e);
+      this.broker.AircraftDeleted += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftDeleted), e);
+      this.broker.AircraftUpdated += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftUpdated), e);
+      this.broker.AtisReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.AtisReceived), e);
+      this.broker.BroadcastMessageReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.BroadcastMessageReceived), e);
+      this.broker.ControllerAdded += (b, e) => HandleInvokedEvent(nameof(IBroker.ControllerAdded), e);
+      this.broker.ControllerDeleted += (b, e) => HandleInvokedEvent(nameof(IBroker.ControllerDeleted), e);
+      this.broker.ControllerFrequencyChanged += (b, e) => HandleInvokedEvent(nameof(IBroker.ControllerFrequencyChanged), e);
+      this.broker.ControllerLocationChanged += (b, e) => HandleInvokedEvent(nameof(IBroker.ControllerLocationChanged), e);
+      this.broker.MetarReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.MetarReceived), e);
+      this.broker.NetworkConnected += (b, e) => HandleInvokedEvent(nameof(IBroker.NetworkConnected), e);
+      this.broker.NetworkDisconnected += (b, e) => HandleInvokedEvent(nameof(IBroker.NetworkDisconnected), e);
+      this.broker.PrivateMessageReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.PrivateMessageReceived), e);
+      this.broker.RadioMessageReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.RadioMessageReceived), e);
+      this.broker.SelcalAlertReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.SelcalAlertReceived), e);
+      this.broker.SessionEnded += (b, e) => HandleInvokedEvent(nameof(IBroker.SessionEnded), e);
+    }
+
+    private void HandleInvokedEvent(string eventName, object eventArgs)
+    {
+      Dictionary<string, object> args = eventArgs.GetType()
+        .GetProperties()
+        .ToDictionary(prop => prop.Name, prop => prop.GetValue(eventArgs, null));
+      var msg = new ProxyMessage(ProxyMessage.EVENT, eventName, args);
+      var json = JsonConvert.SerializeObject(msg);
+
+      string pipeName = this.pipePrefix + "ProxyEventPipe";
+      using (var pipe = new NamedPipeClientStream(pipeName))
+      {
+        pipe.Connect();
+        using (var writer = new StreamWriter(pipe, Encoding.UTF8) { AutoFlush = true })
+        {
+          writer.Write(json);
+        }
+      }
+    }
+
+    public void Dispose()
+    {
+      methodListeningTaskCancelationTokenSource.Cancel();
+      try { methodListeningTask.Wait(); } catch { /* ignore */ }
+      methodListeningTaskCancelationTokenSource.Dispose();
+    }
+  }
+}

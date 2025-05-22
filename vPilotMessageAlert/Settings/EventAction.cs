@@ -7,6 +7,7 @@
     Disconnected,
     RadioMessage,
     SelcalAlert,
-    SystemAlert
+    SystemAlert,
+    ContactMeReminder
   }
 }

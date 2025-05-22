@@ -18,6 +18,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ELogging472", "ELogging472\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotMessageAlertConsoleTest", "VPilotMessageAlertConsoleTest\VPilotMessageAlertConsoleTest.csproj", "{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreBridge", "VPilotNetCoreBridge\VPilotNetCoreBridge.csproj", "{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreModule", "VPilotNetCoreModule\VPilotNetCoreModule.csproj", "{6D849783-F0F1-45B0-8513-35AB727CA909}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreBridgeTest", "VPilotNetCoreConsoleTest\VPilotNetCoreBridgeTest.csproj", "{4D99CFD1-52B6-4E39-B833-865FD3A6D557}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreModuleTest", "VPilotNetCoreModuleTest\VPilotNetCoreModuleTest.csproj", "{033A8668-658E-422F-95B3-0BBD5E1C02C7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Proxying", "Proxying", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,9 +50,31 @@ Global
 		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D849783-F0F1-45B0-8513-35AB727CA909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D849783-F0F1-45B0-8513-35AB727CA909}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D849783-F0F1-45B0-8513-35AB727CA909}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D849783-F0F1-45B0-8513-35AB727CA909}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D99CFD1-52B6-4E39-B833-865FD3A6D557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D99CFD1-52B6-4E39-B833-865FD3A6D557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D99CFD1-52B6-4E39-B833-865FD3A6D557}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D99CFD1-52B6-4E39-B833-865FD3A6D557}.Release|Any CPU.Build.0 = Release|Any CPU
+		{033A8668-658E-422F-95B3-0BBD5E1C02C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{033A8668-658E-422F-95B3-0BBD5E1C02C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{033A8668-658E-422F-95B3-0BBD5E1C02C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{033A8668-658E-422F-95B3-0BBD5E1C02C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{6D849783-F0F1-45B0-8513-35AB727CA909} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{4D99CFD1-52B6-4E39-B833-865FD3A6D557} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{033A8668-658E-422F-95B3-0BBD5E1C02C7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CAF5BAED-985B-4573-B08C-B2D3F3AA879C}

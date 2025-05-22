@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "VPilotNetCore proxy test",
+    "Projects": [
+      {
+        "Path": "VPilotNetCoreConsoleTest\\VPilotNetCoreBridgeTest.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "VPilotNetCoreModuleTest\\VPilotNetCoreModuleTest.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

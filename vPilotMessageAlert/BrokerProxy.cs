@@ -23,6 +23,8 @@ namespace VPilotMessageAlert
 
     public event Action<object, SelcalAlertReceivedEventArgs> SelcalAlertReceived;
 
+    public event Action<object, PrivateMessageReceivedEventArgs> PrivateMessageReceived;
+
     #endregion Public Events
 
     #region Private Fields
@@ -45,7 +47,10 @@ namespace VPilotMessageAlert
       this.vpilot.NetworkDisconnected += Broker_NetworkDisconnected;
       this.vpilot.RadioMessageReceived += Broker_RadioMessageReceived;
       this.vpilot.SelcalAlertReceived += Broker_SelcalAlertReceived;
+      this.vpilot.PrivateMessageReceived += Broker_PrivateMessageReceived;
     }
+
+
 
     public BrokerProxy(MockBroker broker)
     {
@@ -97,6 +102,11 @@ namespace VPilotMessageAlert
     private void Broker_SelcalAlertReceived(object sender, SelcalAlertReceivedEventArgs e)
     {
       this.SelcalAlertReceived?.Invoke(this, e);
+    }
+
+    private void Broker_PrivateMessageReceived(object sender, PrivateMessageReceivedEventArgs e)
+    {
+      this.PrivateMessageReceived?.Invoke(this, e);
     }
 
     #endregion Private Methods

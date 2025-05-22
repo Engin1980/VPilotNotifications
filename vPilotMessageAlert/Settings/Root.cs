@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace VPilotMessageAlert.Settings
@@ -67,6 +68,17 @@ namespace VPilotMessageAlert.Settings
 
       if (this.Vatsim.NoFlightPlanUpdateInterval <= 0) Fail("Vatsim no-flightplan-update-interval must be integer greater than zero.");
       if (this.Vatsim.RefreshFlightPlanUpdateInterval <= 0) Fail("Vatsim refresh-flightplan-update-interval must be integer greater than zero.");
+
+      if (this.Behavior.ContactMeBehavior.RepeatSoundInterval <= 0) Fail("ContactMeBehavior repeat-sound-interval must be integer greater than or equal to zero.");
+      try
+      {
+        Regex regex = new Regex(this.Behavior.ContactMeBehavior.FrequencyRegex);
+        if (regex.GetGroupNumbers().Length < 1) Fail("ContactMeBehavior frequency-regex is invalid - frequency regex group not found.");
+      }
+      catch (Exception ex)
+      {
+        Fail($"ContactMeBehavior frequency-regex '{this.Behavior.ContactMeBehavior.FrequencyRegex}' is invalid - {ex.Message}");
+      }
 
       if (isFailed)
         throw new ApplicationException("Settings check failed. Unable to use settings.");

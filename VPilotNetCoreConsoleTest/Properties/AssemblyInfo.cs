@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("VPilotMessageAlertConsoleTestFW")]
+[assembly: AssemblyTitle("VPilotNetCoreConsoleTest")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("VPilotMessageAlertConsoleTestFW")]
-[assembly: AssemblyCopyright("Copyright ©  2024")]
+[assembly: AssemblyProduct("VPilotNetCoreConsoleTest")]
+[assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f950e97d-c2b0-4413-8c77-6b08b8c7abd5")]
+[assembly: Guid("4d99cfd1-52b6-4e39-b833-865fd3a6d557")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,10 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Build and Revision Numbers
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.6")]
-[assembly: AssemblyFileVersion("1.1.0.6")]
-
-[assembly: AssemblyInformationalVersion("0.1.0.1")]
+[assembly: AssemblyVersion("1.0.0.49")]
+[assembly: AssemblyFileVersion("1.0.0.49")]

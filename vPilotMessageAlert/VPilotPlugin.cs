@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Timers;
 using VPilotMessageAlert;
@@ -33,6 +34,7 @@ namespace VPilotMessageAlert
     private Action radioMessagePlaySoundAction;
     private Action selcalAlertSoundAction;
     private Action systemAlertSoundAction;
+    private Action contactMeReminderAction;
 
     static VPilotPlugin()
     {
@@ -123,6 +125,7 @@ namespace VPilotMessageAlert
       this.brokerProxy.NetworkDisconnected += Broker_NetworkDisconnected;
       this.brokerProxy.RadioMessageReceived += Broker_RadioMessageReceived;
       this.brokerProxy.SelcalAlertReceived += Broker_SelcalAlertReceived;
+      this.brokerProxy.PrivateMessageReceived += BrokerProxy_PrivateMessageReceived;
 
       SetUpDisconnectedTimer(settings.Behavior);
       SetUpActions();
@@ -130,6 +133,26 @@ namespace VPilotMessageAlert
       this.vatsimDataProvider.FlightPlanUpdateProcessed += VatsimDataProvider_FlightPlanUpdateProcessed;
 
       Logger.Log(nameof(VPilotPlugin), LogLevel.INFO, "Plugin seems to be loaded and running.");
+    }
+
+    private void BrokerProxy_PrivateMessageReceived(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.PrivateMessageReceivedEventArgs e)
+    {
+      string msg = e.Message;
+      Regex regex = new Regex(settings.Behavior.ContactMeBehavior.FrequencyRegex);
+      MatchCollection matches = regex.Matches(msg);
+      if (matches.Count > 0)
+      {
+        string frequencyGroup = matches[0].Groups[1].Value;
+        frequencyGroup = frequencyGroup.Replace(",", ".");
+        if (double.TryParse(frequencyGroup, out double frequency) == false)
+        {
+          this.brokerProxy.SendPrivateMessage($"Detected 'Contact me' message, but unable to parse frequency from '{frequencyGroup}' in message '{msg}'.");
+        }
+        else
+        {
+
+        }
+      }
     }
 
     private void VatsimDataProvider_FlightPlanUpdateProcessed(VatsimDataProvider.MonitoredDataRecord flightPlanInfo)
@@ -177,6 +200,13 @@ namespace VPilotMessageAlert
         logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
         if (rule != null)
           this.connectedPlaySoundAction = () => TryPlaySound(rule.File);
+      }
+      {
+        logger.Log(LogLevel.INFO, "Setting up ContactMeReminder-Action");
+        var rule = settings.Events.FirstOrDefault(q => q.Action == Settings.EventAction.ContactMeReminder);
+        logger.Log(LogLevel.DEBUG, rule == null ? "No rule found" : "Found rule with file " + rule.File.Name);
+        if (rule != null)
+          this.contactMeReminderAction = () => TryPlaySound(rule.File);
       }
     }
 

@@ -1,0 +1,5 @@
+﻿{
+  "clientExe": "..\\..\\..\\VPilotNetCoreModuleTest\\bin\\Debug\\net6.0\\VPilotNetCoreModuleTest.exe",
+  "pipeId": "VPilotBridge",
+  "showClientConsole": true
+}

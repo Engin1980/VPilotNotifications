@@ -38,6 +38,13 @@
         "Name": "Sounds\\bell.mp3",
         "Volume": 1
       }
+    },
+    {
+      "Action": "ContactMeReminder",
+      "File": {
+        "Name": "Sounds\\ring.mp3",
+        "Volume": 1
+      }
     }
   ],
   "Vatsim": {
@@ -48,6 +55,11 @@
   "Behavior": {
     "SendPrivateMessageWhenConnectedForTheFirstTime": true,
     "SendPrivateMessageWhenFlightPlanDetected": true,
-    "RepeatAlertIntervalWhenDisconnected":  10
+    "RepeatAlertIntervalWhenDisconnected": 10,
+    "ContactMeBehavior": {
+      "Enabled": true,
+      "FrequencyRegex": "^Contact me.+(1\\d{2}[\\\\.,]\\d+)$",
+      "RepeatSoundInterval": 30
+    }
   }
 }
