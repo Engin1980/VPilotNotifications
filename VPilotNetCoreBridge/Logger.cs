@@ -32,6 +32,21 @@ namespace VPilotNetCoreBridge
         Console.Error.WriteLine($"Logging failed: {ex.Message}");
       }
     }
+
+    public void Clear()
+    {
+      try
+      {
+        if (File.Exists(logFilePath))
+        {
+          File.Delete(logFilePath);
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.Error.WriteLine($"Failed to clear log file: {ex.Message}");
+      }
+    }
   }
 
 }

@@ -10,6 +10,12 @@ namespace VPilotNetCoreBridge
 {
   public class VPilotPlugin
   {
+    public enum Result
+    {
+      Success,
+      Error
+    }
+
     private readonly Logger logger = new Logger();
     private IBroker broker;
     private ServerProxy serverProxy;
@@ -19,28 +25,36 @@ namespace VPilotNetCoreBridge
       logger.Clear();
       logger.Log(Logger.LogLevel.Info, "Initializing VPilotPlugin...");
 
-      Config config = LoadConfig();
-      if (config == null)
+      Config config;
+      if (LoadConfig(out config) == Result.Error)
       {
         logger.Log(Logger.LogLevel.Error, "Failed to load configuration. Plugin will not start.");
         return;
       }
 
       logger.Log(Logger.LogLevel.Info, "Starting client...");
-      StartClient(config);
+      if (StartClient(config) == Result.Error)
+      {
+        logger.Log(Logger.LogLevel.Error, "Failed to load client. Plugin will not start.");
+        return;
+      }
 
       this.broker = broker;
+
+      logger.Log(Logger.LogLevel.Info, "Building Server Proxy.");
       this.serverProxy = new ServerProxy(config.ClientExe, broker);
+
+      logger.Log(Logger.LogLevel.Info, "Initialization completed.");
     }
 
-    private void StartClient(Config config)
+    private Result StartClient(Config config)
     {
       ProcessStartInfo psi = new ProcessStartInfo()
       {
         FileName = config.ClientExe,
         Arguments = $"{config.PipeId}"
       };
-      
+
       if (config.ShowClientConsole == false)
       {
         psi.UseShellExecute = false;
@@ -51,17 +65,28 @@ namespace VPilotNetCoreBridge
       {
         StartInfo = psi
       };
-      p.Start();
+      try
+      {
+        p.Start();
+      }
+      catch (Exception ex)
+      {
+        logger.Log(Logger.LogLevel.Error, $"Failed to start client '{psi.FileName}': {ex.Message}");
+        return Result.Error;
+      }
+
+      return Result.Success;
     }
 
-    private Config LoadConfig()
+    private Result LoadConfig(out Config config)
     {
       string configFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.config.json";
 
       if (System.IO.File.Exists(configFileName) == false)
       {
         logger.Log(Logger.LogLevel.Error, $"Config file {configFileName} not found.");
-        return null;
+        config = null;
+        return Result.Error;
       }
 
       Config ret;
@@ -73,21 +98,25 @@ namespace VPilotNetCoreBridge
       catch (Exception ex)
       {
         logger.Log(Logger.LogLevel.Error, $"Failed to read config file {configFileName}: {ex.Message}");
-        return null;
+        config = null;
+        return Result.Error;
       }
 
       if (System.IO.File.Exists(ret.ClientExe) == false)
       {
         logger.Log(Logger.LogLevel.Error, $"Client executable {ret.ClientExe} ({System.IO.Path.GetFullPath(ret.ClientExe)}) not found.");
-        return null;
+        config = null;
+        return Result.Error;
       }
       if (ret.PipeId.Length == 0)
       {
         logger.Log(Logger.LogLevel.Error, $"Pipe ID {ret.PipeId} is empty.");
-        return null;
+        config = null;
+        return Result.Error;
       }
 
-      return ret;
+      config = ret;
+      return Result.Success;
     }
   }
 }
