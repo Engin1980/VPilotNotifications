@@ -1,0 +1,5 @@
+﻿{
+  "clientExe": "Plugins\\VPilotNetCoreModuleTest\\VPilotNetCoreModuleTest.exe",
+  "pipeId": "VPilotBridge",
+  "showClientConsole": true
+}

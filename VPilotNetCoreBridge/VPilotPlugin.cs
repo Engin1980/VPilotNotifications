@@ -6,9 +6,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+using RossCarlson.Vatsim.Vpilot.Plugins;
+//using VPilotNetCoreBridge.Mock;
+
 namespace VPilotNetCoreBridge
 {
-  public class VPilotPlugin
+  public class VPilotPlugin : RossCarlson.Vatsim.Vpilot.Plugins.IPlugin, IDisposable
   {
     public enum Result
     {
@@ -19,6 +22,8 @@ namespace VPilotNetCoreBridge
     private readonly Logger logger = new Logger();
     private IBroker broker;
     private ServerProxy serverProxy;
+
+    public string Name => "VPilotNetCoreBridge";
 
     public void Initialize(IBroker broker)
     {
@@ -42,7 +47,7 @@ namespace VPilotNetCoreBridge
       this.broker = broker;
 
       logger.Log(Logger.LogLevel.Info, "Building Server Proxy.");
-      this.serverProxy = new ServerProxy(config.ClientExe, broker);
+      this.serverProxy = new ServerProxy(config.PipeId, broker);
 
       logger.Log(Logger.LogLevel.Info, "Initialization completed.");
     }
@@ -59,6 +64,7 @@ namespace VPilotNetCoreBridge
       {
         psi.UseShellExecute = false;
         psi.CreateNoWindow = true;
+        psi.WorkingDirectory = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
       }
 
       Process p = new Process()
@@ -81,6 +87,9 @@ namespace VPilotNetCoreBridge
     private Result LoadConfig(out Config config)
     {
       string configFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.config.json";
+      configFileName = System.IO.Path.Combine(
+        System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+        configFileName);
 
       if (System.IO.File.Exists(configFileName) == false)
       {
@@ -117,6 +126,11 @@ namespace VPilotNetCoreBridge
 
       config = ret;
       return Result.Success;
+    }
+
+    public void Dispose()
+    {
+      logger.Log(Logger.LogLevel.Info, "Disposing VPilotPlugin...");
     }
   }
 }

@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace VPilotNetCoreBridge
 {
-  using System;
-  using System.IO;
-
   public class Logger
   {
     public enum LogLevel
@@ -19,10 +17,17 @@ namespace VPilotNetCoreBridge
       Debug
     }
 
-    private readonly string logFilePath = ".\\_log.txt";
+    private readonly string logFilePath = ".\\Plugins\\_VPilotNetCoreBridge.log";
+    private readonly string prefix = "";
+
+    public Logger(string prefix = "")
+    {
+      this.prefix = prefix;
+    }
 
     public void Log(LogLevel level, string message)
     {
+      message = string.IsNullOrEmpty(prefix) ? message : $"{prefix}: {message}";
       try
       {
         File.AppendAllText(logFilePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\t{level}\t{message}{Environment.NewLine}");

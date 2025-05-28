@@ -1,5 +1,4 @@
-﻿using ESystem.Asserting;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,6 +11,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using RossCarlson.Vatsim.Vpilot.Plugins;
+//using VPilotNetCoreBridge.Mock;
+
 namespace VPilotNetCoreBridge
 {
   internal class ServerProxy : IDisposable
@@ -19,12 +21,15 @@ namespace VPilotNetCoreBridge
     private readonly string pipePrefix;
     private readonly CancellationTokenSource methodListeningTaskCancelationTokenSource = new CancellationTokenSource();
     private readonly Task methodListeningTask;
-    private readonly IBroker broker;
+    private readonly IBroker broker; 
+    private static readonly Logger logger = new Logger("ServerProxy");
 
     private readonly static Dictionary<string, Action<IBroker, Dictionary<string, object>>> incomingMethodHandlers;
 
     static ServerProxy()
     {
+      logger.Log(Logger.LogLevel.Info, "Initializing static ServerProxy handlers...");
+
       incomingMethodHandlers = new Dictionary<string, Action<IBroker, Dictionary<string, object>>>();
 
       incomingMethodHandlers[nameof(IBroker.RequestDisconnect)] = (broker, args) =>
@@ -106,7 +111,6 @@ namespace VPilotNetCoreBridge
         broker.SendPrivateMessage(to, message);
       };
 
-
       // check everything is registered
       var methods = typeof(IBroker)
         .GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
@@ -116,15 +120,23 @@ namespace VPilotNetCoreBridge
       methods.Remove("ToString");
       methods.Remove("GetHashCode");
       methods.RemoveAll(q => incomingMethodHandlers.ContainsKey(q));
-      EAssert.IsTrue(methods.Count == 0, $"Missing handlers for methods: {string.Join(", ", methods)}");
+
+      if (methods.Count > 0)
+        logger.Log(Logger.LogLevel.Error, $"Missing handlers for methods: {string.Join(", ", methods)}");
+
+      logger.Log(Logger.LogLevel.Info, "Static ServerProxy handlers initialized.");
     }
 
     public ServerProxy(string pipePrefix, IBroker broker)
     {
+      logger.Log(Logger.LogLevel.Info, "Creating ServerProxy with pipe prefix: " + pipePrefix);
       this.pipePrefix = pipePrefix;
       this.broker = broker;
+      logger.Log(Logger.LogLevel.Info, "Registering method listeners in nested async task.");
       this.methodListeningTask = Task.Run(() => ListenForMethods(methodListeningTaskCancelationTokenSource.Token));
+      logger.Log(Logger.LogLevel.Info, "Registering event listeners.");
       RegisterEventListeners();
+      logger.Log(Logger.LogLevel.Info, "ServerProxy creation completed.");
     }
 
     private async Task ListenForMethods(CancellationToken token)
@@ -186,6 +198,7 @@ namespace VPilotNetCoreBridge
 
     private void HandleInvokedEvent(string eventName, object eventArgs)
     {
+      logger.Log(Logger.LogLevel.Debug, $"Handling event: {eventName}");
       Dictionary<string, object> args = eventArgs.GetType()
         .GetProperties()
         .ToDictionary(prop => prop.Name, prop => prop.GetValue(eventArgs, null));
@@ -193,6 +206,7 @@ namespace VPilotNetCoreBridge
       var json = JsonConvert.SerializeObject(msg);
 
       string pipeName = this.pipePrefix + "ProxyEventPipe";
+      logger.Log(Logger.LogLevel.Debug, $"Sending via pipe {pipeName}");
       using (var pipe = new NamedPipeClientStream(pipeName))
       {
         pipe.Connect();
@@ -201,6 +215,7 @@ namespace VPilotNetCoreBridge
           writer.Write(json);
         }
       }
+      logger.Log(Logger.LogLevel.Debug, $"Handling event: {eventName} - completed");
     }
 
     public void Dispose()

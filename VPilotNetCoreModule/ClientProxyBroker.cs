@@ -87,9 +87,31 @@ namespace VPilotNetCoreModule
 
     public ClientProxyBroker(string pipePrefix)
     {
+      SetUpLogging();
       this.pipeID = pipePrefix;
       this.eventListeningTask = Task.Run(() => DoEventListening(eventListeningTaskCancelationTokenSource.Token));
       this.eventHandlers = PrepareEventHandlers();
+    }
+
+    private void SetUpLogging()
+    {
+      Action<LogItem> action = logItem =>
+      {
+        string msg = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{logItem.Level}] {logItem.Message}\n";
+        try
+        {
+          File.AppendAllLines("vPilotNetCore.log", new[] { msg });
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"Failed to write log: {ex.Message}");
+        }
+      };
+      List<LogRule> logRules = new List<LogRule>
+      {
+        new LogRule(".*", LogLevel.DEBUG)
+      };
+      Logger.RegisterLogAction(action, logRules);
     }
 
     private Dictionary<string, Action<Dictionary<string, object>>> PrepareEventHandlers()

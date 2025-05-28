@@ -1,22 +1,24 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
 using VPilotNetCoreModule;
 
 
-string pipePrefix = "VPilotPlugin_"; // args[0];
-Console.WriteLine("Starting proxy broker .NET 6  with prefix " + pipePrefix);
+string pipePrefix = args.Length < 1 ? "PipeNameNotProvided???" : args[0];
+Console.WriteLine("Starting proxy broker .NET 6 with prefix " + pipePrefix);
 
 ClientProxyBroker broker = new(pipePrefix);
+Console.WriteLine("Starting proxy broker .NET 6 - completed.");
 
+Console.WriteLine("Attaching event handlers.");
 AttachEventDebugHandlers(broker);
+Console.WriteLine("Attaching event handlers - completed.");
 
 Thread.Sleep(3000);
 broker.RequestDisconnect();
 
-Thread.Sleep(3000);
-broker.SendPrivateMessage("EZY1234", "Hello from .NET 6!");
+//Thread.Sleep(3000);
+//broker.SendPrivateMessage("EZY1234", "Hello from .NET 6!");
 
 Thread.Sleep(50000);
 //broker.RequestDisconnect();
