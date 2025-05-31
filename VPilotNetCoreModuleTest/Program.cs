@@ -1,20 +1,31 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using ESystem.Logging;
 using System.Linq.Expressions;
 using System.Reflection;
 using VPilotNetCoreModule;
 
 
 string pipePrefix = args.Length < 1 ? "PipeNameNotProvided???" : args[0];
-Console.WriteLine("Starting proxy broker .NET 6 with prefix " + pipePrefix);
+Console.WriteLine($"VPilotNetCoreModule - Test -- startup");
+Console.WriteLine($"Pipe prefix: {pipePrefix}");
+Console.WriteLine($"Current directory: {Environment.CurrentDirectory}");
+Console.WriteLine("Initializing log");
+SetUpLogging();
+
+var logger = Logger.Create("VPilotNetCoreModuleTest.Program");
+
+logger.Log(LogLevel.INFO, "Starting proxy broker .NET 6 with prefix " + pipePrefix);
 
 ClientProxyBroker broker = new(pipePrefix);
-Console.WriteLine("Starting proxy broker .NET 6 - completed.");
+logger.Log(LogLevel.INFO, "Starting proxy broker .NET 6 - completed.");
 
-Console.WriteLine("Attaching event handlers.");
+logger.Log(LogLevel.INFO, "Attaching event handlers.");
 AttachEventDebugHandlers(broker);
-Console.WriteLine("Attaching event handlers - completed.");
+logger.Log(LogLevel.INFO, "Attaching event handlers - completed.");
+
 
 Thread.Sleep(3000);
+logger.Log(LogLevel.INFO, "Requesting testing disconnect method to vPilot.");
 broker.RequestDisconnect();
 
 //Thread.Sleep(3000);
@@ -23,6 +34,30 @@ broker.RequestDisconnect();
 Thread.Sleep(50000);
 //broker.RequestDisconnect();
 
+
+static void SetUpLogging()
+{
+  static void action(LogItem logItem)
+  {
+    string logFileName = Path.Combine(
+      Path.GetDirectoryName(Assembly.GetCallingAssembly().Location) ?? "",
+      "vPilotNetCore.log");
+    string msg = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{logItem.Level}] {logItem.Message}\n";
+    try
+    {
+      File.AppendAllLines("vPilotNetCore.log", new[] { msg });
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Failed to write log: {ex.Message}");
+    }
+  }
+  List<LogRule> logRules = new()
+  {
+        new(".*", LogLevel.DEBUG)
+      };
+  Logger.RegisterLogAction(action, logRules);
+}
 
 static void AttachEventDebugHandlers<T>(T obj)
 {

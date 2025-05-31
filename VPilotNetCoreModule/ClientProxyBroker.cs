@@ -87,31 +87,9 @@ namespace VPilotNetCoreModule
 
     public ClientProxyBroker(string pipePrefix)
     {
-      SetUpLogging();
       this.pipeID = pipePrefix;
       this.eventListeningTask = Task.Run(() => DoEventListening(eventListeningTaskCancelationTokenSource.Token));
       this.eventHandlers = PrepareEventHandlers();
-    }
-
-    private void SetUpLogging()
-    {
-      Action<LogItem> action = logItem =>
-      {
-        string msg = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{logItem.Level}] {logItem.Message}\n";
-        try
-        {
-          File.AppendAllLines("vPilotNetCore.log", new[] { msg });
-        }
-        catch (Exception ex)
-        {
-          Console.WriteLine($"Failed to write log: {ex.Message}");
-        }
-      };
-      List<LogRule> logRules = new List<LogRule>
-      {
-        new LogRule(".*", LogLevel.DEBUG)
-      };
-      Logger.RegisterLogAction(action, logRules);
     }
 
     private Dictionary<string, Action<Dictionary<string, object>>> PrepareEventHandlers()
@@ -238,6 +216,7 @@ namespace VPilotNetCoreModule
           using var pipe = new NamedPipeServerStream(pipeName);
           await pipe.WaitForConnectionAsync(token);
 
+          logger.Log(LogLevel.INFO, "Somebody Connected to pipe " + pipeName);
           using var reader = new StreamReader(pipe, Encoding.UTF8);
           string json = await reader.ReadToEndAsync();
 
@@ -261,8 +240,9 @@ namespace VPilotNetCoreModule
       }
     }
 
-    private static T BuildObject<T>(Dictionary<string, object> args) where T : new()
+    private T BuildObject<T>(Dictionary<string, object> args) where T : new()
     {
+      logger.LogMethodStart();
       T ret = new T();
 
       var properties = typeof(T).GetProperties();
@@ -282,10 +262,12 @@ namespace VPilotNetCoreModule
         }
         catch (Exception ex)
         {
+          logger.LogException(ex);
           throw new ApplicationException($"Error setting property {typeof(T).Name}.{property.Name} as {value}", ex);
         }
       }
 
+      logger.LogMethodEnd();
       return ret;
     }
 
@@ -307,42 +289,49 @@ namespace VPilotNetCoreModule
 
     public void RequestMetar(string station)
     {
+      logger.LogMethodStart();
       Dictionary<string, object> args = BuildArgsDictionary(nameof(station), station);
       SendViaPipe(nameof(RequestMetar), args);
     }
 
     public void RequestAtis(string callsign)
     {
+      logger.LogMethodStart();
       Dictionary<string, object> args = BuildArgsDictionary(nameof(callsign), callsign);
       SendViaPipe(nameof(RequestAtis), args);
     }
 
     public void SendRadioMessage(string message)
     {
+      logger.LogMethodStart();
       Dictionary<string, object> args = BuildArgsDictionary(nameof(message), message);
       SendViaPipe(nameof(SendRadioMessage), args);
     }
 
     public void PostDebugMessage(string message)
     {
+      logger.LogMethodStart();
       Dictionary<string, object> args = BuildArgsDictionary(nameof(message), message);
       SendViaPipe(nameof(PostDebugMessage), args);
     }
 
     public void SetModeC(bool modeC)
     {
+      logger.LogMethodStart();
       Dictionary<string, object> args = BuildArgsDictionary(nameof(modeC), modeC);
       SendViaPipe(nameof(SetModeC), args);
     }
 
     public void SquawkIdent()
     {
+      logger.LogMethodStart();
       Dictionary<string, object> args = new Dictionary<string, object>();
       SendViaPipe(nameof(SquawkIdent), args);
     }
 
     public void SetPtt(bool pressed)
     {
+      logger.LogMethodStart();
       Dictionary<string, object> args = BuildArgsDictionary(nameof(pressed), pressed);
       SendViaPipe(nameof(SetPtt), args);
     }

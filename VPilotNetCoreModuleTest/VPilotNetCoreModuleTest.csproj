@@ -5,12 +5,18 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.0.0.36</AssemblyVersion>
-    <FileVersion>1.0.0.36</FileVersion>
+    <AssemblyVersion>1.0.0.37</AssemblyVersion>
+    <FileVersion>1.0.0.37</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VPilotNetCoreModule\VPilotNetCoreModule.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ESystem">
+      <HintPath>..\DLLs\_NET_CORE_6\ESystem.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
