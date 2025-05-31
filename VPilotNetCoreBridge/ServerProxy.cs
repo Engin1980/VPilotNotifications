@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using RossCarlson.Vatsim.Vpilot.Plugins;
+using System.Diagnostics.SymbolStore;
 //using VPilotNetCoreBridge.Mock;
 
 namespace VPilotNetCoreBridge
@@ -21,7 +22,7 @@ namespace VPilotNetCoreBridge
     private readonly string pipePrefix;
     private readonly CancellationTokenSource methodListeningTaskCancelationTokenSource = new CancellationTokenSource();
     private readonly Task methodListeningTask;
-    private readonly IBroker broker; 
+    private readonly IBroker broker;
     private static readonly Logger logger = new Logger("ServerProxy");
 
     private readonly static Dictionary<string, Action<IBroker, Dictionary<string, object>>> incomingMethodHandlers;
@@ -113,9 +114,9 @@ namespace VPilotNetCoreBridge
 
       // check everything is registered
       var methods = typeof(IBroker)
-        .GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
+        .GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
         .Select(q => q.Name)
-        .Where(q=>q.Contains("_") == false)
+        .Where(q => q.Contains("_") == false)
         .ToList();
       methods.Remove("ToString");
       methods.Remove("GetHashCode");
@@ -127,7 +128,7 @@ namespace VPilotNetCoreBridge
       logger.Log(Logger.LogLevel.Info, "Static ServerProxy handlers initialized.");
     }
 
-    public ServerProxy(string pipePrefix, IBroker broker)
+    public ServerProxy(string pipePrefix, bool processAircraftRelatedEvents, IBroker broker)
     {
       logger.Log(Logger.LogLevel.Info, "Creating ServerProxy with pipe prefix: " + pipePrefix);
       this.pipePrefix = pipePrefix;
@@ -135,7 +136,7 @@ namespace VPilotNetCoreBridge
       logger.Log(Logger.LogLevel.Info, "Registering method listeners in nested async task.");
       this.methodListeningTask = Task.Run(() => ListenForMethods(methodListeningTaskCancelationTokenSource.Token));
       logger.Log(Logger.LogLevel.Info, "Registering event listeners.");
-      RegisterEventListeners();
+      RegisterEventListeners(processAircraftRelatedEvents);
       logger.Log(Logger.LogLevel.Info, "ServerProxy creation completed.");
     }
 
@@ -176,11 +177,14 @@ namespace VPilotNetCoreBridge
       }
     }
 
-    private void RegisterEventListeners()
+    private void RegisterEventListeners(bool processAircraftRelatedEvents)
     {
-      this.broker.AircraftAdded += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftAdded), e);
-      this.broker.AircraftDeleted += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftDeleted), e);
-      this.broker.AircraftUpdated += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftUpdated), e);
+      if (processAircraftRelatedEvents)
+      {
+        this.broker.AircraftAdded += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftAdded), e);
+        this.broker.AircraftDeleted += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftDeleted), e);
+        this.broker.AircraftUpdated += (b, e) => HandleInvokedEvent(nameof(IBroker.AircraftUpdated), e);
+      }
       this.broker.AtisReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.AtisReceived), e);
       this.broker.BroadcastMessageReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.BroadcastMessageReceived), e);
       this.broker.ControllerAdded += (b, e) => HandleInvokedEvent(nameof(IBroker.ControllerAdded), e);
@@ -194,6 +198,7 @@ namespace VPilotNetCoreBridge
       this.broker.RadioMessageReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.RadioMessageReceived), e);
       this.broker.SelcalAlertReceived += (b, e) => HandleInvokedEvent(nameof(IBroker.SelcalAlertReceived), e);
       this.broker.SessionEnded += (b, e) => HandleInvokedEvent(nameof(IBroker.SessionEnded), e);
+      this.broker.SessionEnded += (b, e) => this.methodListeningTaskCancelationTokenSource.Cancel();
     }
 
     private void HandleInvokedEvent(string eventName, object eventArgs)

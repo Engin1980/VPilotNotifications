@@ -4,17 +4,19 @@ using System.Linq.Expressions;
 using System.Reflection;
 using VPilotNetCoreModule;
 
-
-string pipePrefix = args.Length < 1 ? "PipeNameNotProvided???" : args[0];
-Console.WriteLine($"VPilotNetCoreModule - Test -- startup");
-Console.WriteLine($"Pipe prefix: {pipePrefix}");
-Console.WriteLine($"Current directory: {Environment.CurrentDirectory}");
-Console.WriteLine("Initializing log");
+Console.WriteLine($"VPilotNetCoreModuleTest startup");
+Console.WriteLine($"Setting up logging at {Environment.CurrentDirectory}");
 SetUpLogging();
-
 var logger = Logger.Create("VPilotNetCoreModuleTest.Program");
 
+string pipePrefix = args.Length < 1 ? "PipeNameNotProvided???" : args[0];
+
+logger.Log(LogLevel.INFO, $"VPilotNetCoreModule - Test -- startup");
+logger.Log(LogLevel.INFO, $"Pipe prefix: {pipePrefix}");
 logger.Log(LogLevel.INFO, "Starting proxy broker .NET 6 with prefix " + pipePrefix);
+logger.Log(LogLevel.INFO, $"Current directory: {Environment.CurrentDirectory}");
+logger.Log(LogLevel.INFO, $"Executing assembly directory: {Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}");
+logger.Log(LogLevel.INFO, $"Calling assembly directory: {Path.GetDirectoryName(Assembly.GetCallingAssembly().Location)}");
 
 ClientProxyBroker broker = new(pipePrefix);
 logger.Log(LogLevel.INFO, "Starting proxy broker .NET 6 - completed.");
@@ -28,24 +30,27 @@ Thread.Sleep(3000);
 logger.Log(LogLevel.INFO, "Requesting testing disconnect method to vPilot.");
 broker.RequestDisconnect();
 
-//Thread.Sleep(3000);
-//broker.SendPrivateMessage("EZY1234", "Hello from .NET 6!");
-
-Thread.Sleep(50000);
-//broker.RequestDisconnect();
-
+while (true)
+{
+  Thread.Sleep(60000);
+  logger.Log(LogLevel.INFO, "Waiting for events...");
+}
 
 static void SetUpLogging()
 {
-  static void action(LogItem logItem)
+  static void actionConsole(LogItem logItem)
+  {
+    Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{logItem.Level}] {logItem.Message}");
+  }
+  static void actionFile(LogItem logItem)
   {
     string logFileName = Path.Combine(
       Path.GetDirectoryName(Assembly.GetCallingAssembly().Location) ?? "",
-      "vPilotNetCore.log");
-    string msg = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{logItem.Level}] {logItem.Message}\n";
+      "_vPilotNetCore.log");
+    string msg = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{logItem.Level}] {logItem.Message}";
     try
     {
-      File.AppendAllLines("vPilotNetCore.log", new[] { msg });
+      File.AppendAllLines(logFileName, new[] { msg });
     }
     catch (Exception ex)
     {
@@ -56,7 +61,8 @@ static void SetUpLogging()
   {
         new(".*", LogLevel.DEBUG)
       };
-  Logger.RegisterLogAction(action, logRules);
+  Logger.RegisterLogAction(actionFile, logRules);
+  Logger.RegisterLogAction(actionConsole, logRules);
 }
 
 static void AttachEventDebugHandlers<T>(T obj)
