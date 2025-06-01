@@ -3,51 +3,48 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{B876EA93-8C48-4620-9875-D8FADCDC6ED5}"
-	ProjectSection(SolutionItems) = preProject
-		DLLs\ELogging.dll = DLLs\ELogging.dll
-		DLLs\ESystem.dll = DLLs\ESystem.dll
-		DLLs\RossCarlson.Vatsim.Vpilot.Plugins.dll = DLLs\RossCarlson.Vatsim.Vpilot.Plugins.dll
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DLLs", "_DLLs", "{B876EA93-8C48-4620-9875-D8FADCDC6ED5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotMessageAlert", "VPilotMessageAlert\VPilotMessageAlert.csproj", "{6D5EB17C-9A00-47A5-8905-48CBC8E13436}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotMessageAlert", "Deprecated\VPilotMessageAlert\VPilotMessageAlert.csproj", "{6D5EB17C-9A00-47A5-8905-48CBC8E13436}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESystem472", "ESystem472\ESystem472.csproj", "{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotMessageAlertConsoleTest", "Tests\VPilotMessageAlertConsoleTest\VPilotMessageAlertConsoleTest.csproj", "{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ELogging472", "ELogging472\ELogging472.csproj", "{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreBridge", "Base\VPilotNetCoreBridge\VPilotNetCoreBridge.csproj", "{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotMessageAlertConsoleTest", "VPilotMessageAlertConsoleTest\VPilotMessageAlertConsoleTest.csproj", "{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreModule", "Base\VPilotNetCoreModule\VPilotNetCoreModule.csproj", "{6D849783-F0F1-45B0-8513-35AB727CA909}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreBridge", "VPilotNetCoreBridge\VPilotNetCoreBridge.csproj", "{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreBridgeTest", "Tests\VPilotNetCoreConsoleTest\VPilotNetCoreBridgeTest.csproj", "{4D99CFD1-52B6-4E39-B833-865FD3A6D557}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreModule", "VPilotNetCoreModule\VPilotNetCoreModule.csproj", "{6D849783-F0F1-45B0-8513-35AB727CA909}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreBridgeTest", "VPilotNetCoreConsoleTest\VPilotNetCoreBridgeTest.csproj", "{4D99CFD1-52B6-4E39-B833-865FD3A6D557}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreModuleTest", "VPilotNetCoreModuleTest\VPilotNetCoreModuleTest.csproj", "{033A8668-658E-422F-95B3-0BBD5E1C02C7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Proxying", "Proxying", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		copyBuildToVPilot.bat = copyBuildToVPilot.bat
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreModuleTest", "Tests\VPilotNetCoreModuleTest\VPilotNetCoreModuleTest.csproj", "{033A8668-658E-422F-95B3-0BBD5E1C02C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NET_472", "_NET_472", "{CBBF0A20-7CB8-49B3-9C9C-B32988229762}"
 	ProjectSection(SolutionItems) = preProject
-		DLLs\_NET_472\ESystem472.dll = DLLs\_NET_472\ESystem472.dll
-		DLLs\_NET_472\ESystem472.pdb = DLLs\_NET_472\ESystem472.pdb
-		DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.dll = DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.dll
-		DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.xml = DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.xml
+		_DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.dll = _DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.dll
+		_DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.xml = _DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NET_CORE_6", "_NET_CORE_6", "{A56ADE86-D3E1-4680-9762-D62233247FE5}"
 	ProjectSection(SolutionItems) = preProject
-		DLLs\_NET_CORE_6\ESystem.dll = DLLs\_NET_CORE_6\ESystem.dll
-		DLLs\_NET_CORE_6\ESystem.pdb = DLLs\_NET_CORE_6\ESystem.pdb
+		_DLLs\_NET_CORE_6\ESystem.dll = _DLLs\_NET_CORE_6\ESystem.dll
+		_DLLs\_NET_CORE_6\ESystem.pdb = _DLLs\_NET_CORE_6\ESystem.pdb
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetCoreMessageAlert", "VPilotNetCoreMessageAlert\VPilotNetCoreMessageAlert.csproj", "{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetAlert", "Implementations\VPilotNetAlert\VPilotNetAlert.csproj", "{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlugintTestToDelete", "PlugintTestToDelete\PlugintTestToDelete.csproj", "{ABE84B5C-BCDA-4AB1-BB8F-BA8EF19B535D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deprecated", "Deprecated", "{7E2BB8C5-CA8C-403F-B4E6-1E6873E286C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementations", "Implementations", "{3F5F92D7-E66C-4FC6-B048-34F81F4B187C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{30D5D51D-406C-4C1F-8E64-9EC104ADE0D8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{EB3C4DF2-A1FA-4666-9B22-9B8B4882328F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_BATs", "_BATs", "{21229B10-5E09-4207-BCAB-BC827B3A8162}"
+	ProjectSection(SolutionItems) = preProject
+		_BATs\copyBuildToVPilot-nb.bat = _BATs\copyBuildToVPilot-nb.bat
+		_BATs\copyBuildToVPilot.bat = _BATs\copyBuildToVPilot.bat
+		_BATs\createRelease.bat = _BATs\createRelease.bat
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,14 +56,6 @@ Global
 		{6D5EB17C-9A00-47A5-8905-48CBC8E13436}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D5EB17C-9A00-47A5-8905-48CBC8E13436}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D5EB17C-9A00-47A5-8905-48CBC8E13436}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FEDF12C8-7FBD-496B-9D02-2E59C32AA95A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4BC9B116-5CFF-4154-B5F8-2B09C168E7FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,23 +80,20 @@ Global
 		{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ABE84B5C-BCDA-4AB1-BB8F-BA8EF19B535D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ABE84B5C-BCDA-4AB1-BB8F-BA8EF19B535D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ABE84B5C-BCDA-4AB1-BB8F-BA8EF19B535D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ABE84B5C-BCDA-4AB1-BB8F-BA8EF19B535D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{6D849783-F0F1-45B0-8513-35AB727CA909} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{4D99CFD1-52B6-4E39-B833-865FD3A6D557} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{033A8668-658E-422F-95B3-0BBD5E1C02C7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{6D5EB17C-9A00-47A5-8905-48CBC8E13436} = {7E2BB8C5-CA8C-403F-B4E6-1E6873E286C8}
+		{F950E97D-C2B0-4413-8C77-6B08B8C7ABD5} = {7E2BB8C5-CA8C-403F-B4E6-1E6873E286C8}
+		{2749CFE9-EDC8-41B4-8BDD-B9D50C40D884} = {EB3C4DF2-A1FA-4666-9B22-9B8B4882328F}
+		{6D849783-F0F1-45B0-8513-35AB727CA909} = {EB3C4DF2-A1FA-4666-9B22-9B8B4882328F}
+		{4D99CFD1-52B6-4E39-B833-865FD3A6D557} = {30D5D51D-406C-4C1F-8E64-9EC104ADE0D8}
+		{033A8668-658E-422F-95B3-0BBD5E1C02C7} = {30D5D51D-406C-4C1F-8E64-9EC104ADE0D8}
 		{CBBF0A20-7CB8-49B3-9C9C-B32988229762} = {B876EA93-8C48-4620-9875-D8FADCDC6ED5}
 		{A56ADE86-D3E1-4680-9762-D62233247FE5} = {B876EA93-8C48-4620-9875-D8FADCDC6ED5}
-		{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{ABE84B5C-BCDA-4AB1-BB8F-BA8EF19B535D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B} = {3F5F92D7-E66C-4FC6-B048-34F81F4B187C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CAF5BAED-985B-4573-B08C-B2D3F3AA879C}
