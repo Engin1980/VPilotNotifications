@@ -1,6 +1,4 @@
 ﻿//using ESystem.Asserting;
-//using RossCarlson.Vatsim.Vpilot.Plugins;
-//using RossCarlson.Vatsim.Vpilot.Plugins.Events;
 //using System;
 //using System.Collections.Generic;
 //using System.Diagnostics.Eventing.Reader;
@@ -9,7 +7,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace VPilotMessageAlert
+//namespace VPilotNetAlert
 //{
 //  internal class BrokerProxy
 //  {

@@ -3,63 +3,49 @@
     "Level": "TRACE",
     "FileName": "_log.txt"
   },
-  "Events": [
-    {
-      "Action": "SystemAlert",
-      "File": {
-        "Name": "Sounds\\selcal.mp3",
+  "Tasks": {
+    "ContactMe": {
+      "Enabled": true,
+      "FrequencyRegex": "^Contact me.+(1\\d{2}[\\\\.,]\\d+)$",
+      "RepeatSoundInterval": null,
+      "AudioFile": {
+        "Name": "Sounds\\ring.mp3",
         "Volume": 1
       }
     },
-    {
-      "Action": "SelCalAlert",
-      "File": {
-        "Name": "Sounds\\selcal.mp3",
+    "NoFlightPlan": {
+      "Enabled": true,
+      "DetectionOnParkingBrake": true,
+      "DetectionOnHeight": 3000,
+      "DetectionInterval": 60,
+      "AudioFile": {
+        "Name": "Sounds\\noFlightPlan.mp3",
         "Volume": 1
       }
     },
-    {
-      "Action": "Connected",
-      "File": {
-        "Name": "Sounds\\connected.mp3",
-        "Volume": 1
-      }
-    },
-    {
-      "Action": "Disconnected",
-      "File": {
-        "Name": "Sounds\\disconnected.mp3",
-        "Volume": 1
-      }
-    },
-    {
-      "Action": "RadioMessage",
-      "File": {
+    "ImportantRadioMessage": {
+      "Enabled": true,
+      "AudioFile": {
         "Name": "Sounds\\bell.mp3",
         "Volume": 1
       }
     },
-    {
-      "Action": "ContactMeReminder",
-      "File": {
-        "Name": "Sounds\\ring.mp3",
+    "Disconnected": {
+      "Enabled": true,
+      "RepeatInterval": 10,
+      "AudioFile": {
+        "Name": "Sounds\\disconnect.mp3",
         "Volume": 1
       }
     }
-  ],
+  },
   "Vatsim": {
     "Sources": [ "https://data.vatsim.net/v3/vatsim-data.json" ],
     "NoFlightPlanUpdateInterval": 2,
     "RefreshFlightPlanUpdateInterval": 10
   },
-  "Behavior": {
+  "Global": {
     "SendPrivateMessageWhenConnectedForTheFirstTime": true,
-    "SendPrivateMessageWhenFlightPlanDetected": true,
-    "RepeatAlertIntervalWhenDisconnected": 10,
-    "ContactMeBehavior": {
-      "Enabled": true,
-      "FrequencyRegex": "^Contact me.+(1\\d{2}[\\\\.,]\\d+)$",
-      "RepeatSoundInterval": 30
-    }
+    "SendPrivateMessageWhenFlightPlanDetected": true
   }
 }

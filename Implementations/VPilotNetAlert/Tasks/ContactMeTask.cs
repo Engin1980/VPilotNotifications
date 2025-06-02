@@ -1,0 +1,139 @@
+﻿using ESimConnect;
+using ESystem.Logging;
+using System;
+using System.Collections.Generic;
+using System.IO.IsolatedStorage;
+using System.Linq;
+using System.Reflection.Metadata.Ecma335;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Timers;
+using VPilotNetAlert.Settings;
+using VPilotNetCoreModule;
+
+namespace VPilotNetAlert.Tasks
+{
+  internal class ContactMeTask : AbstractTask
+  {
+    private class ContactMeData
+    {
+      public double Frequency { get; }
+      public DateTime CreatedAt { get; }
+
+      public ContactMeData(double frequency)
+      {
+        Frequency = frequency;
+        CreatedAt = DateTime.Now;
+      }
+    }
+
+    private bool isNetworkConnected = false;
+    private ContactMeData? data = null;
+    private System.Timers.Timer checkTimer;
+    private readonly ContactMeConfig config;
+    private readonly TypeId[] comFrequencyTypeId;
+    private readonly TypeId[] comReceivingTypeId;
+
+    public ContactMeTask(TaskInitData data, ContactMeConfig config) : base(data)
+    {
+      Logger.Log(LogLevel.INFO, "ContactMeTask initalizing.");
+      this.config = config ?? throw new ArgumentNullException(nameof(config), "ContactMeConfig cannot be null.");
+
+      data.Broker.NetworkConnected += (s, e) => this.isNetworkConnected = true;
+      data.Broker.NetworkDisconnected += (s, e) => this.isNetworkConnected = false;
+
+      data.Broker.RadioMessageReceived += Broker_RadioMessageReceived;
+      Logger.Log(LogLevel.INFO, "ContactMeTask initialized.");
+
+      this.checkTimer = new System.Timers.Timer(config.RepeatSoundInterval * 1000)
+      {
+        AutoReset = true,
+        Enabled = false,
+      };
+      this.checkTimer.Elapsed += CheckTimer_Elapsed;
+
+      comFrequencyTypeId = new TypeId[3];
+      comReceivingTypeId = new TypeId[3];
+      for (int i = 0; i < 3; i++)
+      {
+        comFrequencyTypeId[i] = data.ESimWrapper.ValueCache.Register($"COM ACTIVE FREQUENCY:{i + 1}");
+        comReceivingTypeId[i] = data.ESimWrapper.ValueCache.Register($"COM RECEIVE:{i + 1}");
+      }
+    }
+
+    private void CheckTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    {
+      CheckRadioTuning();
+      if (this.data == null)
+      {
+        this.checkTimer.Stop();
+        Logger.Log(LogLevel.DEBUG, "No ContactMe data available. Timer elapsed without action.");
+        return;
+      }
+      else
+      {
+        Logger.Log(LogLevel.DEBUG, $"ContactMe data available. Frequency: {this.data.Frequency}, CreatedAt: {this.data.CreatedAt}");
+        base.SendSystemPrivateMessage($"Contact me on frequency {this.data.Frequency} MHz. Original request created at {this.data.CreatedAt:HH:mm:ss}.");
+        Audio.PlayAudioFile(this.config.AudioFile.Name, this.config.AudioFile.Volume);
+      }
+    }
+
+    private void CheckRadioTuning()
+    {
+      if (this.data == null) return;
+
+      for (int i = 0; i < 3; i++)
+      {
+        double freq = this.ESimWrapper.ValueCache.GetValue(comFrequencyTypeId[i]);
+        double receiving = this.ESimWrapper.ValueCache.GetValue(comReceivingTypeId[i]);
+        if (freq == this.data.Frequency && receiving > 0.5)
+        {
+          Logger.Log(LogLevel.DEBUG, $"Radio tuned to frequency {freq} on COM{i + 1}. ContactMe data is valid.");
+          this.data = null;
+          return; // Radio is tuned to the correct frequency
+        }
+      }
+    }
+
+    private void Broker_RadioMessageReceived(object? sender, RadioMessageReceivedEventArgs e)
+    {
+      Logger.Log(LogLevel.DEBUG, $"Radio message received: {e.From} :: {e.Message}");
+      if (!IsContactMeMessage(e, out double frequency))
+      {
+        Logger.Log(LogLevel.DEBUG, "Not a ContactMe message. Ignoring.");
+        return;
+      }
+
+      if (isNetworkConnected == false)
+      {
+        Logger.Log(LogLevel.WARNING, "Network is not connected. Cannot process radio messages.");
+        return;
+      }
+
+      this.data = new ContactMeData(frequency);
+      this.checkTimer.Start();
+    }
+
+    private bool IsContactMeMessage(RadioMessageReceivedEventArgs e, out double frequency)
+    {
+      string msg = e.Message;
+      Regex regex = new(config.FrequencyRegex);
+      MatchCollection matches = regex.Matches(msg);
+      if (matches.Count > 0)
+      {
+        string frequencyGroup = matches[0].Groups[1].Value;
+        frequencyGroup = frequencyGroup.Replace(",", ".");
+        if (double.TryParse(frequencyGroup, out frequency) == false)
+          return true;
+        else
+        {
+          this.Logger.Log(LogLevel.ERROR, $"Detected 'Contact me' message, but unable to parse frequency from '{frequencyGroup}' in message '{msg}'.");
+          return false;
+        }
+      }
+      frequency = double.NaN;
+      return false;
+    }
+  }
+}
