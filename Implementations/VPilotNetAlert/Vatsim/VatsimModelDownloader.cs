@@ -15,16 +15,16 @@ namespace VPilotNetAlert.Vatsim
 
     public static Logger Logger { get => logger; set => logger = value; }
 
-    public static async Task<Model> DownloadAsync(List<string> urls)
+    public static async Task<Model?> DownloadAsync(List<string> urls)
     {
       string data = await DownloadDataAsync(urls);
-      Model model = TryParseModel(data);
+      Model? model = TryParseModel(data);
       return model;
     }
 
-    public static Model Download(List<string> urls)
+    public static Model? Download(List<string> urls)
     {
-      Model ret = DownloadAsync(urls).GetAwaiter().GetResult();
+      Model? ret = DownloadAsync(urls).GetAwaiter().GetResult();
       return ret;
     }
 
@@ -49,9 +49,8 @@ namespace VPilotNetAlert.Vatsim
       return ret;
     }
 
-    private static Model TryParseModel(string data)
+    private static Model? TryParseModel(string data)
     {
-      FlightPlan? ret = null;
       Logger.Log(LogLevel.TRACE, "Deserializing data");
       Model? model = JsonConvert.DeserializeObject<Model>(data);
       Logger.Log(LogLevel.TRACE, "Data deserialized.");
@@ -61,44 +60,7 @@ namespace VPilotNetAlert.Vatsim
         return null;
       }
 
-      int mcid = vatsimId;
-
-      Logger.Log(LogLevel.TRACE, $"Looking for flight-plan for {mcid} between active pilots");
-      var pilot = model.Pilots.FirstOrDefault(q => q.CID == mcid);
-      FlightPlan? fp = null;
-      if (pilot != null)
-      {
-        Logger.Log(LogLevel.TRACE, "Active pilot Flight-plan found");
-        fp = pilot.Flight_plan;
-      }
-      else
-      {
-        Logger.Log(LogLevel.TRACE, $"Looking for flight-plan for {mcid} between prefiled plans");
-        var prefile = model.Prefiles.FirstOrDefault(q => q.CID == mcid);
-        if (prefile != null)
-        {
-          Logger.Log(LogLevel.TRACE, "Prefiled Flight-plan found");
-          fp = prefile.Flight_plan;
-          fp.RevisionId = -1;
-        }
-      }
-      if (fp != null)
-      {
-        if (CurrentFlightPlan == null || CurrentFlightPlan.RevisionId < 0 || CurrentFlightPlan.RevisionId != fp.RevisionId)
-        {
-          Logger.Log(LogLevel.TRACE, "New flight plan/revision found");
-          ret = fp;
-          ret.RevisionId = ret.RevisionId ?? -1;
-        }
-        else
-        {
-          Logger.Log(LogLevel.TRACE, "Flight-plan will not be updated");
-        }
-      }
-      else
-        Logger.Log(LogLevel.DEBUG, "No prefile found or update not needed");
-
-      return ret;
+      return model;
     }
   }
 }
