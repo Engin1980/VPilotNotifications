@@ -1,7 +1,23 @@
 {
   "Logging": {
-    "Level": "TRACE",
-    "FileName": "_log.txt"
+    "Rules": [
+      {
+        "Pattern": "WinHandleManager",
+        "Level": "WARNING"
+      },
+      {
+        "Pattern": "ESimConnect.+",
+        "Level": "WARNING"
+      },
+      {
+        "Pattern": "ClientProxyBroker",
+        "Level": "WARNING"
+      },
+      {
+        "Pattern": ".*",
+        "Level": "TRACE"
+      }
+    ]
   },
   "Tasks": {
     "ContactMe": {

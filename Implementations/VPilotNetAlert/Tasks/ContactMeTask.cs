@@ -40,11 +40,11 @@ namespace VPilotNetAlert.Tasks
       Logger.Log(LogLevel.INFO, "ContactMeTask initalizing.");
       this.config = config ?? throw new ArgumentNullException(nameof(config), "ContactMeConfig cannot be null.");
 
+      Logger.Log(LogLevel.DEBUG, "Registering event handlers for network and radio messages.");
       data.Broker.NetworkConnected += (s, e) => this.isNetworkConnected = true;
       data.Broker.NetworkDisconnected += (s, e) => this.isNetworkConnected = false;
-
-      data.Broker.RadioMessageReceived += Broker_RadioMessageReceived;
-      Logger.Log(LogLevel.INFO, "ContactMeTask initialized.");
+      data.Broker.PrivateMessageReceived += Broker_PrivateMessageReceived;
+      Logger.Log(LogLevel.DEBUG, "Event handlers registered.");
 
       this.checkTimer = new System.Timers.Timer(config.RepeatSoundInterval * 1000)
       {
@@ -53,6 +53,7 @@ namespace VPilotNetAlert.Tasks
       };
       this.checkTimer.Elapsed += CheckTimer_Elapsed;
 
+      Logger.Log(LogLevel.DEBUG, "Registering COM frequency and receiving TypeIds.");
       comFrequencyTypeId = new TypeId[3];
       comReceivingTypeId = new TypeId[3];
       for (int i = 0; i < 3; i++)
@@ -60,10 +61,14 @@ namespace VPilotNetAlert.Tasks
         comFrequencyTypeId[i] = data.ESimWrapper.ValueCache.Register($"COM ACTIVE FREQUENCY:{i + 1}");
         comReceivingTypeId[i] = data.ESimWrapper.ValueCache.Register($"COM RECEIVE:{i + 1}");
       }
+      Logger.Log(LogLevel.DEBUG, "COM frequency and receiving TypeIds registered.");
+
+      Logger.Log(LogLevel.INFO, "ContactMeTask initialized.");
     }
 
     private void CheckTimer_Elapsed(object? sender, ElapsedEventArgs e)
     {
+      Logger.Log(LogLevel.DEBUG, "CheckTimer elapsed. Checking radio tuning and ContactMe data.");
       CheckRadioTuning();
       if (this.data == null)
       {
@@ -88,6 +93,7 @@ namespace VPilotNetAlert.Tasks
         double freq = this.ESimWrapper.ValueCache.GetValue(comFrequencyTypeId[i]);
         freq = freq / 100000; // convert from BCD format to MHz (e.g., 127850000 to 127.85 MHz)
         double receiving = this.ESimWrapper.ValueCache.GetValue(comReceivingTypeId[i]);
+        Logger.Log(LogLevel.TRACE, $"Checking COM{i + 1}: Frequency = {freq} MHz, Receiving = {receiving}");
         if (freq == this.data.Frequency && receiving > 0.5)
         {
           Logger.Log(LogLevel.DEBUG, $"Radio tuned to frequency {freq} on COM{i + 1}. ContactMe data is valid.");
@@ -97,7 +103,7 @@ namespace VPilotNetAlert.Tasks
       }
     }
 
-    private void Broker_RadioMessageReceived(object? sender, RadioMessageReceivedEventArgs e)
+    private void Broker_PrivateMessageReceived(object? sender, PrivateMessageReceivedEventArgs e)
     {
       Logger.Log(LogLevel.DEBUG, $"Radio message received: {e.From} :: {e.Message}");
       if (!IsContactMeMessage(e, out double frequency))
@@ -112,11 +118,12 @@ namespace VPilotNetAlert.Tasks
         return;
       }
 
+      Logger.Log(LogLevel.INFO, $"Detected 'Contact me' message from {e.From} with frequency {frequency} MHz.");
       this.data = new ContactMeData(frequency);
       this.checkTimer.Start();
     }
 
-    private bool IsContactMeMessage(RadioMessageReceivedEventArgs e, out double frequency)
+    private bool IsContactMeMessage(PrivateMessageReceivedEventArgs e, out double frequency)
     {
       string msg = e.Message;
       Regex regex = new(config.FrequencyRegex);

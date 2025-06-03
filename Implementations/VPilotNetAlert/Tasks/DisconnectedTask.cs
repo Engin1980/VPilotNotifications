@@ -21,6 +21,8 @@ namespace VPilotNetAlert.Tasks
     {
       EAssert.Argument.IsNotNull(config, nameof(config));
 
+      Logger.Log(LogLevel.INFO, "DisconnectedTask initializing.");
+
       this.config = config;
       this.checkTimer = new System.Timers.Timer(30000)
       {
@@ -41,10 +43,13 @@ namespace VPilotNetAlert.Tasks
         isNetworkConnected = true;
         this.checkTimer.Stop();
       };
+
+      Logger.Log(LogLevel.INFO, "DisconnectedTask initialized.");
     }
 
     private void CheckTimer_Elapsed(object? sender, ElapsedEventArgs e)
     {
+      Logger.Log(LogLevel.DEBUG, "CheckTimer elapsed. Checking network connection status.");
       if (isNetworkConnected)
       {
         Logger.Log(LogLevel.DEBUG, "Network is connected. No action needed.");

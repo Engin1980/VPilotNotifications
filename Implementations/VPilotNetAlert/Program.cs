@@ -22,26 +22,36 @@ namespace VPilotNetAlert
 
     static void Main(string[] args)
     {
-      InitLogging();
+      LoadConfig(out List<LogRule> rules, out string? errorMessage);
 
-      string pipeId = args.Length > 0 ? args[0] : string.Empty;
-      logger.Log(LogLevel.INFO, $"Starting VPilotNetAlert with pipe ID '{pipeId}'");
+      InitLogging(rules);
 
-      // load config
-      LoadConfig();
       if (config == null)
       {
+        logger.Log(LogLevel.ERROR, "Config load error: " + errorMessage);
         logger.Log(LogLevel.ERROR, "Configuration is null after loading. Exiting.");
         return;
       }
-      logger.Log(LogLevel.DEBUG, $"Configuration loaded.");
+      logger.Log(LogLevel.DEBUG, $"Configuration loaded. Logging initialized.");
+
+      string? pipeId = args.Length > 0 ? args[0] : null;
+      if (string.IsNullOrEmpty(pipeId))
+      {
+        logger.Log(LogLevel.ERROR, "No pipe ID provided. Please provide a pipe ID as the first argument. Aborted.");
+        return;
+      }
+      logger.Log(LogLevel.INFO, $"Starting VPilotNetAlert with pipe ID '{pipeId}'");
 
       // init sim & broker
+      logger.Log(LogLevel.INFO, "Initializing ESimWrapper...");
       eSimWrapper = new ESimWrapper();
+      logger.Log(LogLevel.INFO, "Initializing ESimWrapper... - completed");
+      logger.Log(LogLevel.INFO, "Initializing VPilotNetCoreModule.ClientProxyBroker...");
       broker = new VPilotNetCoreModule.ClientProxyBroker(pipeId);
+      logger.Log(LogLevel.INFO, "Initializing VPilotNetCoreModule.ClientProxyBroker... - completed");
 
       // init Vatsim Flight Plan Provider
-      logger.Log(LogLevel.INFO, "Initializing VATSIM flight plan provider III...");
+      logger.Log(LogLevel.INFO, "Initializing VATSIM flight plan provider ...");
       vatsimDataProvider = new VatsimFlightPlanProvider(broker, config.Vatsim);
       logger.Log(LogLevel.INFO, "Initializing VATSIM flight plan provider... - completed");
 
@@ -52,7 +62,10 @@ namespace VPilotNetAlert
         logger.Log(LogLevel.INFO, "Initializing tasks...");
         StartTasks();
       }
+      logger.Log(LogLevel.INFO, "Opening connection to FS...");
       eSimWrapper.Open.OpenInBackground(initTasks);
+      logger.Log(LogLevel.INFO, "Opening connection to FS... - completed");
+
 
       // main run loop
       logger.Log(LogLevel.INFO, "Entering main app loop...");
@@ -63,19 +76,14 @@ namespace VPilotNetAlert
       }
     }
 
-    private static void InitLogging()
+    private static void InitLogging(List<LogRule> rules)
     {
-      List<LogRule> rules = new()
-      {
-        new(".*", LogLevel.TRACE)
-      };
-
       void saveToFile(LogItem li)
       {
         string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", $"{DateTime.Now:yyyy-MM-dd}.log");
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string level = $"[{li.Level}]";
-        File.AppendAllText(logFilePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {level, -8} {li.Sender,-25}: {li.Message}{Environment.NewLine}");
+        File.AppendAllText(logFilePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {level,-8} {li.Sender,-25}: {li.Message}{Environment.NewLine}");
       }
 
       void printToConsole(LogItem li)
@@ -119,14 +127,16 @@ namespace VPilotNetAlert
       }
     }
 
-    private static void LoadConfig()
+    private static void LoadConfig(out List<LogRule> rules, out string? errorMessage)
     {
+      rules = new();
+
       Config? cfg;
       string configAbsoluteFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, CONFIG_FILE_NAME);
 
       if (!File.Exists(configAbsoluteFilePath))
       {
-        logger.Log(LogLevel.ERROR, $"Config file '{CONFIG_FILE_NAME}' not found at '{configAbsoluteFilePath}'. Please ensure it exists.");
+        errorMessage = $"Config file '{CONFIG_FILE_NAME}' not found at '{configAbsoluteFilePath}'. Please ensure it exists.";
         return;
       }
 
@@ -137,13 +147,13 @@ namespace VPilotNetAlert
       }
       catch (Exception ex)
       {
-        logger.Log(LogLevel.ERROR, $"Failed to deserialize config from '{configAbsoluteFilePath}': {ex.Message}");
+        errorMessage = $"Failed to deserialize config from '{configAbsoluteFilePath}': {ex.Message}";
         return;
       }
 
       if (cfg == null)
       {
-        logger.Log(LogLevel.ERROR, $"Failed to deserialize config from '{configAbsoluteFilePath}'. Please check the file format.");
+        errorMessage = $"Failed to deserialize config from '{configAbsoluteFilePath}'. Please check the file format.";
         return;
       }
 
@@ -155,10 +165,11 @@ namespace VPilotNetAlert
       if (!isValid)
       {
         var messages = string.Join(Environment.NewLine, results.Select(r => $"- {r.ErrorMessage}"));
-        logger.Log(LogLevel.ERROR, $"Config validation failed:{Environment.NewLine}{messages}");
+        errorMessage = $"Config validation failed:{Environment.NewLine}{messages}";
         return;
       }
 
+      errorMessage = null;
       Program.config = cfg;
     }
   }

@@ -20,16 +20,23 @@ namespace VPilotNetAlert.Tasks
     {
       EAssert.Argument.IsNotNull(config, nameof(config));
 
+      Logger.Log(LogLevel.DEBUG, $"ImportantRadioMessageAlertTask initializing.");
+
       this.config = config;
       this.Broker.NetworkConnected += (s, e) => this.connectedCallsign = e.Callsign.ToUpperInvariant();
       this.Broker.NetworkDisconnected += (s, e) => this.connectedCallsign = string.Empty;
       this.Broker.RadioMessageReceived += Broker_RadioMessageReceived;
       this.VatsimFlightPlanProvider.FlightPlanUpdated += e => this.flightPlan = e.Current;
+
+      Logger.Log(LogLevel.DEBUG, $"ImportantRadioMessageAlertTask initialized.");
     }
 
     private void Broker_RadioMessageReceived(object? sender, RadioMessageReceivedEventArgs e)
     {
+      Logger.Log(LogLevel.DEBUG, $"Radio message received: {e.Message}");
+
       bool isImportant = IsMessageToMonitoredDataMatch(e.Message);
+      Logger.Log(LogLevel.TRACE, $"Message '{e.Message}' is important: {isImportant}");
       if (isImportant)
         Audio.PlayAudioFile(this.config.AudioFile.Name, this.config.AudioFile.Volume);
     }
@@ -51,7 +58,7 @@ namespace VPilotNetAlert.Tasks
             ret = true;
         }
       }
-      this.Logger.Log(LogLevel.DEBUG, $"Message '{message}' checked with result {ret}");
+      this.Logger.Log(LogLevel.TRACE, $"Message '{message}' checked with result {ret}");
       return ret;
     }
   }
