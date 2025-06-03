@@ -1,6 +1,7 @@
 ﻿using ESystem.Logging;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.ComponentModel.DataAnnotations;
 using VPilotNetAlert.Settings;
 using VPilotNetAlert.Tasks;
@@ -73,12 +74,14 @@ namespace VPilotNetAlert
       {
         string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", $"{DateTime.Now:yyyy-MM-dd}.log");
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
-        File.AppendAllText(logFilePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{li.Level}] {li.Sender}: {li.Message}{Environment.NewLine}");
+        string level = $"[{li.Level}]";
+        File.AppendAllText(logFilePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {level, -8} {li.Sender,-25}: {li.Message}{Environment.NewLine}");
       }
 
       void printToConsole(LogItem li)
       {
-        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{li.Level}] {li.Sender}: {li.Message}");
+        string level = $"[{li.Level}]";
+        Console.WriteLine($"{DateTime.Now:HH:mm:ss} {level,-8} {li.Sender,-25}: {li.Message}");
       }
 
       Logger.RegisterLogAction(saveToFile, rules);
