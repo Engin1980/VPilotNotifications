@@ -34,28 +34,28 @@ namespace VPilotNetAlert
         logger.Log(LogLevel.ERROR, "Configuration is null after loading. Exiting.");
         return;
       }
+      logger.Log(LogLevel.DEBUG, $"Configuration loaded.");
 
       // init sim & broker
       eSimWrapper = new ESimWrapper();
       broker = new VPilotNetCoreModule.ClientProxyBroker(pipeId);
 
       // init Vatsim Flight Plan Provider
-      logger.Log(LogLevel.INFO, "Initializing VATSIM flight plan provider...");
+      logger.Log(LogLevel.INFO, "Initializing VATSIM flight plan provider III...");
       vatsimDataProvider = new VatsimFlightPlanProvider(broker, config.Vatsim);
+      logger.Log(LogLevel.INFO, "Initializing VATSIM flight plan provider... - completed");
 
       // init tasks
-      void initTasks()
+      logger.Log(LogLevel.INFO, "Prepating task initialization...");
+      static void initTasks()
       {
         logger.Log(LogLevel.INFO, "Initializing tasks...");
         StartTasks();
       }
-      if (eSimWrapper.Open.IsOpened)
-        initTasks();
-      else
-        eSimWrapper.Open.Opened += initTasks;
-
+      eSimWrapper.Open.OpenInBackground(initTasks);
 
       // main run loop
+      logger.Log(LogLevel.INFO, "Entering main app loop...");
       broker.SessionEnded += (s, e) => IsSupposedToClose = true;
       while (!IsSupposedToClose)
       {

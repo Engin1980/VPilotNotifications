@@ -86,6 +86,7 @@ namespace VPilotNetAlert.Tasks
       for (int i = 0; i < 3; i++)
       {
         double freq = this.ESimWrapper.ValueCache.GetValue(comFrequencyTypeId[i]);
+        freq = freq / 100000; // convert from BCD format to MHz (e.g., 127850000 to 127.85 MHz)
         double receiving = this.ESimWrapper.ValueCache.GetValue(comReceivingTypeId[i]);
         if (freq == this.data.Frequency && receiving > 0.5)
         {

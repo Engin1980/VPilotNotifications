@@ -1,5 +1,5 @@
 ﻿{
-  "clientExe": "Plugins\\VPilotNetCoreModuleTest\\VPilotNetCoreModuleTest.exe",
-  "pipeId": "VPilotBridge",
+  "clientExe": "Plugins\\VPilotNetAlert\\VPilotNetAlert.exe",
+  "pipeId": "VPilotNetAlert",
   "showClientConsole": true
 }
