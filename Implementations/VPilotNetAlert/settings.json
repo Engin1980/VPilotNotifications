@@ -7,7 +7,7 @@
     "ContactMe": {
       "Enabled": true,
       "FrequencyRegex": "^Contact me.+(1\\d{2}[\\\\.,]\\d+)$",
-      "RepeatSoundInterval": null,
+      "RepeatSoundInterval": 30,
       "AudioFile": {
         "Name": "Sounds\\ring.mp3",
         "Volume": 1

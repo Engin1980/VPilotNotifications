@@ -21,6 +21,8 @@ namespace VPilotNetAlert
 
     static void Main(string[] args)
     {
+      InitLogging();
+
       string pipeId = args.Length > 0 ? args[0] : string.Empty;
       logger.Log(LogLevel.INFO, $"Starting VPilotNetAlert with pipe ID '{pipeId}'");
 
@@ -60,6 +62,31 @@ namespace VPilotNetAlert
       }
     }
 
+    private static void InitLogging()
+    {
+      List<LogRule> rules = new()
+      {
+        new(".*", LogLevel.TRACE)
+      };
+
+      void saveToFile(LogItem li)
+      {
+        string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", $"{DateTime.Now:yyyy-MM-dd}.log");
+        Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
+        File.AppendAllText(logFilePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{li.Level}] {li.Sender}: {li.Message}{Environment.NewLine}");
+      }
+
+      void printToConsole(LogItem li)
+      {
+        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{li.Level}] {li.Sender}: {li.Message}");
+      }
+
+      Logger.RegisterLogAction(saveToFile, rules);
+      Logger.RegisterLogAction(printToConsole, rules);
+
+      logger.Log(LogLevel.INFO, "Logging system initialized.");
+    }
+
     private static readonly List<AbstractTask> tasks = new List<AbstractTask>();
 
     private static void StartTasks()
@@ -91,6 +118,7 @@ namespace VPilotNetAlert
 
     private static void LoadConfig()
     {
+      Config? cfg;
       string configAbsoluteFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, CONFIG_FILE_NAME);
 
       if (!File.Exists(configAbsoluteFilePath))
@@ -99,19 +127,27 @@ namespace VPilotNetAlert
         return;
       }
 
-      var json = File.ReadAllText(configAbsoluteFilePath);
+      try
+      {
+        var json = File.ReadAllText(configAbsoluteFilePath);
+        cfg = JsonConvert.DeserializeObject<Config>(json);
+      }
+      catch (Exception ex)
+      {
+        logger.Log(LogLevel.ERROR, $"Failed to deserialize config from '{configAbsoluteFilePath}': {ex.Message}");
+        return;
+      }
 
-      var config = JsonConvert.DeserializeObject<Config>(json);
-      if (config == null)
+      if (cfg == null)
       {
         logger.Log(LogLevel.ERROR, $"Failed to deserialize config from '{configAbsoluteFilePath}'. Please check the file format.");
         return;
       }
 
       // Optional: Validate using DataAnnotations
-      var context = new ValidationContext(config);
+      var context = new ValidationContext(cfg);
       var results = new List<ValidationResult>();
-      bool isValid = Validator.TryValidateObject(config, context, results, validateAllProperties: true);
+      bool isValid = Validator.TryValidateObject(cfg, context, results, validateAllProperties: true);
 
       if (!isValid)
       {
@@ -120,7 +156,7 @@ namespace VPilotNetAlert
         return;
       }
 
-      Program.config = config;
+      Program.config = cfg;
     }
   }
 }
