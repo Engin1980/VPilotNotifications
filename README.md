@@ -1,4 +1,4 @@
-# 🛪🔊 VPilot Alert (plugin) 🔊🛪
+# 🛪🔊 VPilot Notifications (plugin) 🔊🛪
 
 A simple tool adding sound **notifications** to [VPilot](https://vpilot.rosscarlson.dev/):
 * 🔊 when **your callsign, departure or destination airport is mentioned in radio communication**;
@@ -19,6 +19,12 @@ To obtain the tool:
 
 The tool is based on .NET Framework 4.7.2 (which is used by VPilot by default, so if you are using VPilot, you should be fine) and .NET 6 (which is installed on Windows 10+ devices by default).
 
+**Final check** You should have 
+* `...\VPilot\Plugins\VPilotNetCoreBridge.dll` and 
+* `...\VPilot\Plugins\VPilotNotifications\VPilotNotification.exe` files 
+
+... where `...\VPilot` represents VPilot installation folder.
+
 # ✓ Validating installation
 Ensure you are using the default `settings.json` file.
 
@@ -29,12 +35,12 @@ Ensure you are using the default `settings.json` file.
 
 Also, you should see:
 * VPilot plugin log file at `...\VPilot\Plugins\_VPilotNetCoreBridge.log`
-* VPilot Alert log file at `...\VPilot\Plugins\VPilotNetAlert\_VPilotAlert.log` 
+* VPilot Alert log file at `...\VPilot\Plugins\VPilotNotifications\_VPilotNotifications.log` 
 
 If anything goes wrong, check the content of those two files.
 
 # 🛠 Setting up (optional)
-The connection information and flight plan are automatically read from the VPilot connection and online VATSIM data. However, you can adjust the sounds, processed events and update intervals. All the settings are available in the configuration file at `...\VPilot\Plugins\VPilotNetAlert\settings.json`.
+The connection information and flight plan are automatically read from the VPilot connection and online VATSIM data. However, you can adjust the sounds, processed events and update intervals. All the settings are available in the configuration file at `...\VPilot\Plugins\VPilotNotifications\settings.json`.
 
 # 🛪 Usage
 Once added to the `Plugins` folder, there is no additional set-up. Just start VPilot and connect to the network. However, you can adjust settings - see the previous section.
