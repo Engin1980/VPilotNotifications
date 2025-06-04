@@ -83,6 +83,12 @@ namespace VPilotNetAlert
       eSimWrapper.Open.OpenInBackground(initTasks);
       logger.Log(LogLevel.INFO, "Opening connection to FS... - completed");
 
+      // connected "message"
+      broker.NetworkConnected += (s, e) =>
+      {
+        broker.SendPrivateMessage(SENDER, "Connected to VPilotNetAlert. Welcome!");
+      };
+
 
       // main run loop
       logger.Log(LogLevel.INFO, "Entering main app loop wait...");
