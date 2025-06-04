@@ -18,7 +18,7 @@ logger.Log(LogLevel.INFO, $"Current directory: {Environment.CurrentDirectory}");
 logger.Log(LogLevel.INFO, $"Executing assembly directory: {Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}");
 logger.Log(LogLevel.INFO, $"Calling assembly directory: {Path.GetDirectoryName(Assembly.GetCallingAssembly().Location)}");
 
-ClientProxyBroker broker = new(pipePrefix);
+ClientProxyBroker broker = new(pipePrefix, 1000);
 logger.Log(LogLevel.INFO, "Starting proxy broker .NET 6 - completed.");
 
 logger.Log(LogLevel.INFO, "Attaching event handlers.");

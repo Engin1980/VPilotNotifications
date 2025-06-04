@@ -62,7 +62,7 @@ namespace VPilotNetAlert
       eSimWrapper = new ESimWrapper();
       logger.Log(LogLevel.INFO, "Initializing ESimWrapper... - completed");
       logger.Log(LogLevel.INFO, "Initializing VPilotNetCoreModule.ClientProxyBroker...");
-      broker = new VPilotNetCoreModule.ClientProxyBroker(pipeId);
+      broker = new VPilotNetCoreModule.ClientProxyBroker(pipeId, config.Global.ConnectTimeout);
       logger.Log(LogLevel.INFO, "Initializing VPilotNetCoreModule.ClientProxyBroker... - completed");
 
       // init Vatsim Flight Plan Provider
