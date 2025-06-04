@@ -1,6 +1,6 @@
 {
   "Logging": {
-    "FileName": "_vpilotalert.log",
+    "FileName": "_VPilotAlert.log",
     "Rules": [
       {
         "Pattern": "WinHandleManager",
@@ -23,6 +23,18 @@
         "Level": "DEBUG"
       },
       {
+        "Pattern": "ContactMeTask",
+        "Level": "DEBUG"
+      },
+      {
+        "Pattern": "ImportantRadioMessageAlertTask",
+        "Level": "DEBUG"
+      },
+      {
+        "Pattern": "NoFlightPlanTask",
+        "Level": "DEBUG"
+      },
+      {
         "Pattern": ".*",
         "Level": "TRACE"
       }
@@ -32,7 +44,7 @@
     "ContactMe": {
       "Enabled": true,
       "FrequencyRegex": "^Contact me.+(1\\d{2}[\\.\\,]\\d+)",
-      "RepeatSoundInterval": 5,
+      "RepeatSoundInterval": 25,
       "AudioFile": {
         "Name": "Sounds\\contactMe.mp3",
         "Volume": 1
@@ -57,7 +69,7 @@
     },
     "Disconnected": {
       "Enabled": false,
-      "RepeatInterval": 10,
+      "RepeatInterval": 30,
       "AudioFile": {
         "Name": "Sounds\\disconnected.mp3",
         "Volume": 1
@@ -71,6 +83,7 @@
   },
   "Global": {
     "SendPrivateMessageWhenConnectedForTheFirstTime": true,
-    "SendPrivateMessageWhenFlightPlanDetected": true
+    "SendPrivateMessageWhenFlightPlanDetected": true,
+    "ConnectTimeout": 250
   }
 }

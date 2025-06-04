@@ -1,5 +1,6 @@
 ﻿{
   "clientExe": "Plugins\\VPilotNetAlert\\VPilotNetAlert.exe",
   "pipeId": "VPilotNetAlert",
-  "showClientConsole": true
+  "showClientConsole": true,
+  "connectTimeout": 250
 }

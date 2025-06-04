@@ -119,6 +119,9 @@ namespace VPilotNetAlert.Settings
     public bool SendPrivateMessageWhenConnectedForTheFirstTime { get; set; }
 
     public bool SendPrivateMessageWhenFlightPlanDetected { get; set; }
+
+    [Range(1, int.MaxValue)]
+    public int ConnectTimeout { get; set; }
   }
 
 }

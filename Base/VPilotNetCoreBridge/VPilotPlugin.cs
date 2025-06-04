@@ -52,7 +52,11 @@ namespace VPilotNetCoreBridge
       this.broker = broker;
 
       logger.Log(Logger.LogLevel.Info, "Building Server Proxy.");
-      this.serverProxy = new ServerProxy(config.PipeId, config.ProcessAircraftRelatedEvents, broker);
+      this.serverProxy = new ServerProxy(
+        config.PipeId, 
+        config.ProcessAircraftRelatedEvents, 
+        config.ConnectTimeout,
+        broker);
 
       logger.Log(Logger.LogLevel.Info, "Initialization completed.");
 

@@ -23,6 +23,7 @@ namespace VPilotNetCoreBridge
     private readonly CancellationTokenSource methodListeningTaskCancelationTokenSource = new CancellationTokenSource();
     private readonly Task methodListeningTask;
     private readonly IBroker broker;
+    private readonly int connectTimeout;
     private static readonly Logger logger = new Logger("ServerProxy");
 
     private readonly static Dictionary<string, Action<IBroker, Dictionary<string, object>>> incomingMethodHandlers;
@@ -128,11 +129,12 @@ namespace VPilotNetCoreBridge
       logger.Log(Logger.LogLevel.Info, "Static ServerProxy handlers initialized.");
     }
 
-    public ServerProxy(string pipePrefix, bool processAircraftRelatedEvents, IBroker broker)
+    public ServerProxy(string pipePrefix, bool processAircraftRelatedEvents, int connectTimeout, IBroker broker)
     {
       logger.Log(Logger.LogLevel.Info, "Creating ServerProxy with pipe prefix: " + pipePrefix);
       this.pipePrefix = pipePrefix;
       this.broker = broker;
+      this.connectTimeout = connectTimeout;
       logger.Log(Logger.LogLevel.Info, "Registering method listeners in nested async task.");
       this.methodListeningTask = Task.Run(() => ListenForMethods(methodListeningTaskCancelationTokenSource.Token));
       logger.Log(Logger.LogLevel.Info, "Registering event listeners.");
@@ -214,10 +216,23 @@ namespace VPilotNetCoreBridge
       logger.Log(Logger.LogLevel.Debug, $"Sending via pipe {pipeName}");
       using (var pipe = new NamedPipeClientStream(pipeName))
       {
-        pipe.Connect();
-        using (var writer = new StreamWriter(pipe, Encoding.UTF8) { AutoFlush = true })
+        try
         {
-          writer.Write(json);
+          pipe.Connect(this.connectTimeout);
+
+          using (var writer = new StreamWriter(pipe, Encoding.UTF8) { AutoFlush = true })
+          {
+            writer.Write(json);
+          }
+        } catch (TimeoutException ex)
+        {
+          logger.Log(Logger.LogLevel.Error, $"Failed to connect to pipe {pipeName} on TimeOut: {ex.Message}");
+          return;
+        }
+        catch (IOException ex)
+        {
+          logger.Log(Logger.LogLevel.Error, $"IO error connecting/sending to pipe {pipeName}: {ex.Message}");
+          return;
         }
       }
       logger.Log(Logger.LogLevel.Debug, $"Handling event: {eventName} - completed");

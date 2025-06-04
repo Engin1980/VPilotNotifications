@@ -20,6 +20,7 @@ namespace VPilotNetCoreModule
     private readonly string pipeID;
     private readonly CancellationTokenSource eventListeningTaskCancelationTokenSource = new();
     private readonly Task eventListeningTask;
+    private readonly int connectTimeout;
 
     public event EventHandler? SessionEnded;
     public event EventHandler? NetworkDisconnected;
@@ -56,7 +57,15 @@ namespace VPilotNetCoreModule
 
       logger.Log(LogLevel.DEBUG, $"Sending message to pipe {pipeName}: {json}");
       using var pipe = new NamedPipeClientStream(pipeName);
-      pipe.Connect();
+      try
+      {
+        pipe.Connect(this.connectTimeout);
+      }
+      catch (TimeoutException ex)
+      {
+        logger.Log(LogLevel.ERROR, $"Failed to connect to pipe {pipeName} within {this.connectTimeout}ms: {ex.Message}");
+        return;
+      }
 
       using var writer = new StreamWriter(pipe, Encoding.UTF8) { AutoFlush = true };
       writer.Write(json);
@@ -85,8 +94,11 @@ namespace VPilotNetCoreModule
       SendViaPipe(nameof(RequestDisconnect), null);
     }
 
-    public ClientProxyBroker(string pipePrefix)
+    public ClientProxyBroker(string pipePrefix, int connectTimeout)
     {
+      EAssert.Argument.IsTrue(connectTimeout > 0, nameof(connectTimeout), connectTimeout + " must be greater than 0");
+
+      this.connectTimeout = connectTimeout;
       this.pipeID = pipePrefix;
       this.eventListeningTask = Task.Run(() => DoEventListening(eventListeningTaskCancelationTokenSource.Token));
       this.eventHandlers = PrepareEventHandlers();
@@ -256,7 +268,7 @@ namespace VPilotNetCoreModule
         }
         else if (property.PropertyType.IsArray && property.PropertyType.GetElementType() == typeof(int))
         {
-          value = ((JArray) value).ToObject<int[]>();
+          value = ((JArray)value).ToObject<int[]>();
         }
         else if (value is Int64)
           value = Convert.ToInt32(value);
