@@ -1,6 +1,6 @@
 {
   "Logging": {
-    "FileName": "_VPilotAlert.log",
+    "FileName": "_VPilotNotifications.log",
     "Rules": [
       {
         "Pattern": "WinHandleManager",
@@ -35,7 +35,7 @@
         "Level": "INFO"
       },
       {
-        "Pattern": "VPilotNetAlert.Program",
+        "Pattern": "VPilotNotifications.Program",
         "Level": "INFO"
       },
       {

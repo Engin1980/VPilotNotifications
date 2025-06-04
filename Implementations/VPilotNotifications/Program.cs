@@ -20,12 +20,12 @@ namespace Eng.VPilotNotifications
 {
   internal class Program
   {
-    public const string SENDER = "VPilotNetAlert";
+    public const string SENDER = "VPilotNotifications";
     private const string CONFIG_FILE_NAME = "settings.json";
     public static bool IsSupposedToClose { get; set; } = false;
     private static VPilotNetCoreModule.ClientProxyBroker broker = null!;
     private static ESimWrapper eSimWrapper = null!;
-    private static readonly Logger logger = Logger.Create("VPilotNetAlert.Program");
+    private static readonly Logger logger = Logger.Create("VPilotNotifications.Main");
     private static VatsimFlightPlanProvider vatsimDataProvider = null!;
     private static Config config = null!;
     private static readonly object LOG_FILE_LOCK = new object();
@@ -47,13 +47,13 @@ namespace Eng.VPilotNotifications
       logger.Log(LogLevel.DEBUG, $"Configuration loaded. Logging initialized.");
       logger.Log(LogLevel.DEBUG, $"Log file name: {logFileName}");
 
-      string? pipeId = args.Length > 0 ? args[0] : "?";
+      string? pipeId = args.Length > 0 ? args[0] : null;
       if (string.IsNullOrEmpty(pipeId))
       {
         logger.Log(LogLevel.ERROR, "No pipe ID provided. Please provide a pipe ID as the first argument. Aborted.");
         return;
       }
-      logger.Log(LogLevel.INFO, $"Starting VPilotNetAlert with pipe ID '{pipeId}'");
+      logger.Log(LogLevel.INFO, $"Starting VPilotNotifications with pipe ID '{pipeId}'");
 
       logger.Log(LogLevel.DEBUG, $"Current assembly base directory: '{AppDomain.CurrentDomain.BaseDirectory}'");
       logger.Log(LogLevel.DEBUG, $"Current working directory: '{System.IO.Directory.GetCurrentDirectory()}'");
@@ -86,7 +86,7 @@ namespace Eng.VPilotNotifications
       // connected "message"
       broker.NetworkConnected += (s, e) =>
       {
-        broker.SendPrivateMessage(SENDER, "Connected to VPilotNetAlert. Welcome!");
+        broker.SendPrivateMessage(SENDER, "Connected to VPilotNotifications plugin. Welcome!");
       };
 
 

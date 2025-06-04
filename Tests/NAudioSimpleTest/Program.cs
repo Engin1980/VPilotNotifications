@@ -3,7 +3,7 @@ using NAudio.Wave;
 
 Console.WriteLine("NAudio, Hello, World!");
 
-string file = @"..\..\..\..\..\Implementations\VPilotNetAlert\Sounds\disconnected.mp3";
+string file = @"..\..\..\..\..\Implementations\VPilotNotifications\Sounds\disconnected.mp3";
 string absFile = System.IO.Path.GetFullPath(file);
 
 //WaveStream mainOutputStream = new Mp3FileReader(file);

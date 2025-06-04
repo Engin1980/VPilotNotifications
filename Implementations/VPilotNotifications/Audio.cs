@@ -11,7 +11,7 @@ namespace Eng.VPilotNotifications
 {
   internal static class Audio
   {
-    private static readonly Logger logger = Logger.Create("VPilotNetAlert.Audio");
+    private static readonly Logger logger = Logger.Create("VPilotNotifications.Audio");
 
     internal static async Task PlayAudioFileAsync(string file, double volume)
     {

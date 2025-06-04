@@ -4,11 +4,11 @@ COPY ..\Base\VPilotNetCoreBridge\bin\Debug\*.*  C:\Users\vajgma91\AppData\Local\
 rem copy PlugintTestToDelete\bin\Debug\*.*  C:\Users\vajgma91\AppData\Local\vPilot\Plugins
 
 ECHO Copy Client
-MKDIR C:\Users\vajgma91\AppData\Local\vPilot\Plugins\VPilotNetAlert
-COPY ..\Implementations\VPilotNetAlert\bin\Debug\net6.0-windows\*.* C:\Users\vajgma91\AppData\Local\vPilot\Plugins\VPilotNetAlert\
+MKDIR C:\Users\vajgma91\AppData\Local\vPilot\Plugins\VPilotNotifications
+COPY ..\Implementations\VPilotNotifications\bin\Debug\net6.0-windows\*.* C:\Users\vajgma91\AppData\Local\vPilot\Plugins\VPilotNotifications\
 
-MKDIR C:\Users\vajgma91\AppData\Local\vPilot\Plugins\VPilotNetAlert\Sounds
-COPY ..\Implementations\VPilotNetAlert\bin\Debug\net6.0-windows\Sounds\*.* C:\Users\vajgma91\AppData\Local\vPilot\Plugins\VPilotNetAlert\Sounds\
+MKDIR C:\Users\vajgma91\AppData\Local\vPilot\Plugins\VPilotNotifications\Sounds
+COPY ..\Implementations\VPilotNotifications\bin\Debug\net6.0-windows\Sounds\*.* C:\Users\vajgma91\AppData\Local\vPilot\Plugins\VPilotNotifications\Sounds\
 
 DEL C:\Users\vajgma91\AppData\Local\vPilot\Plugins\RossCarlson.Vatsim.Vpilot.Plugins.dll
 DEL C:\Users\vajgma91\AppData\Local\vPilot\Plugins\RossCarlson.Vatsim.Vpilot.Plugins.xml

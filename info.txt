@@ -1,5 +1,5 @@
 https://vpilot.rosscarlson.dev/PluginInstructions.txt
-Https://www.Vatir.Ir/vatsimdata.Txt
+Https://www.Vatir.Ir/vatsimdata.txt
 
 
 
