@@ -26,9 +26,6 @@ namespace VPilotNetAlert.Settings
   public class LoggingConfig
   {
     [Required]
-    public string Level { get; set; } = null!;
-
-    [Required]
     public string FileName { get; set; } = null!;
   }
 
@@ -66,13 +63,12 @@ namespace VPilotNetAlert.Settings
   {
     public bool Enabled { get; set; }
     [Range(1, int.MaxValue)]
-    public int RepeatInterval { get; set; }
     public bool DetectionOnParkingBrake { get; set; } = true;
 
     [Range(1, int.MaxValue)]
     public int DetectionOnHeight { get; set; } = 1000;
     [Range(1, int.MaxValue)]
-    public int DetectionInterval { get; set; } = 10;
+    public int DetectionOnHeightInterval { get; set; } = 10;
     [Required]
     public AudioFileConfig AudioFile { get; set; } = null!;
   }

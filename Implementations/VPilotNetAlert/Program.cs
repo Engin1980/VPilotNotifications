@@ -1,11 +1,20 @@
-﻿using ESystem.Logging;
+﻿using ESystem;
+using ESystem.Asserting;
+using ESystem.Json;
+using ESystem.Logging;
+using NAudio.Wave;
 using Newtonsoft.Json;
 using System;
-using System.IO;
+using System.CodeDom;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Windows.Interop;
 using VPilotNetAlert.Settings;
 using VPilotNetAlert.Tasks;
 using VPilotNetAlert.Vatsim;
+using static ESimConnect.Definitions.SimUnits;
 
 namespace VPilotNetAlert
 {
@@ -19,28 +28,34 @@ namespace VPilotNetAlert
     private static readonly Logger logger = Logger.Create("VPilotNetAlert.Program");
     private static VatsimFlightPlanProvider vatsimDataProvider = null!;
     private static Config config = null!;
+    private static readonly object LOG_FILE_LOCK = new object();
+    private static string? logFileName = null;
 
     static void Main(string[] args)
     {
-      LoadConfig(out List<LogRule> rules, out string? errorMessage);
+      Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+      
+      InitLogging();
 
-      InitLogging(rules);
-
+      LoadConfig();
       if (config == null)
       {
-        logger.Log(LogLevel.ERROR, "Config load error: " + errorMessage);
         logger.Log(LogLevel.ERROR, "Configuration is null after loading. Exiting.");
         return;
       }
       logger.Log(LogLevel.DEBUG, $"Configuration loaded. Logging initialized.");
+      logger.Log(LogLevel.DEBUG, $"Log file name: {logFileName}");
 
-      string? pipeId = args.Length > 0 ? args[0] : null;
+      string? pipeId = args.Length > 0 ? args[0] : "?";
       if (string.IsNullOrEmpty(pipeId))
       {
         logger.Log(LogLevel.ERROR, "No pipe ID provided. Please provide a pipe ID as the first argument. Aborted.");
         return;
       }
       logger.Log(LogLevel.INFO, $"Starting VPilotNetAlert with pipe ID '{pipeId}'");
+
+      logger.Log(LogLevel.DEBUG, $"Current assembly base directory: '{AppDomain.CurrentDomain.BaseDirectory}'");
+      logger.Log(LogLevel.DEBUG, $"Current working directory: '{System.IO.Directory.GetCurrentDirectory()}'");
 
       // init sim & broker
       logger.Log(LogLevel.INFO, "Initializing ESimWrapper...");
@@ -61,6 +76,7 @@ namespace VPilotNetAlert
       {
         logger.Log(LogLevel.INFO, "Initializing tasks...");
         StartTasks();
+        logger.Log(LogLevel.INFO, "Initializing tasks... - completed");
       }
       logger.Log(LogLevel.INFO, "Opening connection to FS...");
       eSimWrapper.Open.OpenInBackground(initTasks);
@@ -76,29 +92,49 @@ namespace VPilotNetAlert
       }
     }
 
-    private static void InitLogging(List<LogRule> rules)
+    private static void InitLogging()
     {
+      List<LogRule> rules;
+      try
+      {
+        EJDict ejObj = EJObject.Load(ConfigAbsoluteFilePath);
+        EJDict ejLogging = ejObj["Logging"].AsDict() ?? throw new ArgumentException();
+        var ejRules = ejLogging["Rules"] ?? throw new ArgumentException();
+        rules = LogUtils.LoadLogRulesFromJson(ejRules, "Pattern", "Level");
+        if (rules.Count == 0) throw new ArgumentException();
+      }
+      catch (Exception)
+      {
+        rules = new List<LogRule>
+        {
+          new(".*", LogLevel.TRACE)
+        };
+      }
+
       void saveToFile(LogItem li)
       {
-        string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", $"{DateTime.Now:yyyy-MM-dd}.log");
-        Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
+        if (Program.logFileName == null) return;
+
         string level = $"[{li.Level}]";
-        File.AppendAllText(logFilePath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {level,-8} {li.Sender,-25}: {li.Message}{Environment.NewLine}");
+        lock (LOG_FILE_LOCK)
+        {
+          File.AppendAllText(Program.logFileName, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {level,-8} {li.Sender,-35}: {li.Message}{Environment.NewLine}");
+        }
       }
 
       void printToConsole(LogItem li)
       {
         string level = $"[{li.Level}]";
-        Console.WriteLine($"{DateTime.Now:HH:mm:ss} {level,-8} {li.Sender,-25}: {li.Message}");
+        Console.WriteLine($"{DateTime.Now:HH:mm:ss} {level,-8} {li.Sender,-35}: {li.Message}");
       }
 
       Logger.RegisterLogAction(saveToFile, rules);
       Logger.RegisterLogAction(printToConsole, rules);
 
-      logger.Log(LogLevel.INFO, "Logging system initialized.");
+      logger.Log(LogLevel.INFO, $"Logging system initialized with {rules.Count} rules.");
     }
 
-    private static readonly List<AbstractTask> tasks = new List<AbstractTask>();
+    private static readonly List<AbstractTask> tasks = new();
 
     private static void StartTasks()
     {
@@ -125,35 +161,41 @@ namespace VPilotNetAlert
         at = new DisconnectedTask(taskInitData, config.Tasks.Disconnected);
         tasks.Add(at);
       }
+
+      if (config.Tasks.NoFlightPlan.Enabled)
+      {
+        logger.Log(LogLevel.INFO, "Starting NoFlightPlan task...");
+        at = new NoFlightPlanTask(taskInitData, config.Tasks.NoFlightPlan);
+        tasks.Add(at);
+      }
     }
 
-    private static void LoadConfig(out List<LogRule> rules, out string? errorMessage)
+    private static string ConfigAbsoluteFilePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, CONFIG_FILE_NAME);
+
+    private static void LoadConfig()
     {
-      rules = new();
-
       Config? cfg;
-      string configAbsoluteFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, CONFIG_FILE_NAME);
 
-      if (!File.Exists(configAbsoluteFilePath))
+      if (!File.Exists(ConfigAbsoluteFilePath))
       {
-        errorMessage = $"Config file '{CONFIG_FILE_NAME}' not found at '{configAbsoluteFilePath}'. Please ensure it exists.";
+        logger.Log(LogLevel.ERROR, $"Config file '{CONFIG_FILE_NAME}' not found at '{ConfigAbsoluteFilePath}'. Please ensure it exists.");
         return;
       }
 
       try
       {
-        var json = File.ReadAllText(configAbsoluteFilePath);
+        var json = File.ReadAllText(ConfigAbsoluteFilePath);
         cfg = JsonConvert.DeserializeObject<Config>(json);
       }
       catch (Exception ex)
       {
-        errorMessage = $"Failed to deserialize config from '{configAbsoluteFilePath}': {ex.Message}";
+        logger.Log(LogLevel.ERROR, $"Failed to deserialize config from '{ConfigAbsoluteFilePath}': {ex.Message}");
         return;
       }
 
       if (cfg == null)
       {
-        errorMessage = $"Failed to deserialize config from '{configAbsoluteFilePath}'. Please check the file format.";
+        logger.Log(LogLevel.ERROR, $"Failed to deserialize config from '{ConfigAbsoluteFilePath}'. Please check the file format.");
         return;
       }
 
@@ -165,11 +207,14 @@ namespace VPilotNetAlert
       if (!isValid)
       {
         var messages = string.Join(Environment.NewLine, results.Select(r => $"- {r.ErrorMessage}"));
-        errorMessage = $"Config validation failed:{Environment.NewLine}{messages}";
+        logger.Log(LogLevel.ERROR, $"Config validation failed:{Environment.NewLine}{messages}");
         return;
       }
 
-      errorMessage = null;
+
+      Program.logFileName = Path.Combine(Directory.GetCurrentDirectory(), cfg.Logging.FileName);
+      Directory.CreateDirectory(Path.GetDirectoryName(logFileName)!);
+
       Program.config = cfg;
     }
   }

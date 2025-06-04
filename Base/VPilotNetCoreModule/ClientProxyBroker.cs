@@ -212,11 +212,11 @@ namespace VPilotNetCoreModule
         try
         {
           string pipeName = this.pipeID + "ProxyEventPipe";
-          logger.Log(LogLevel.INFO, "Opening Server-Pipe " + pipeName);
+          logger.Log(LogLevel.DEBUG, "Opening Server-Pipe " + pipeName);
           using var pipe = new NamedPipeServerStream(pipeName);
           await pipe.WaitForConnectionAsync(token);
 
-          logger.Log(LogLevel.INFO, "Somebody Connected to pipe " + pipeName);
+          logger.Log(LogLevel.DEBUG, "Somebody Connected to pipe " + pipeName);
           using var reader = new StreamReader(pipe, Encoding.UTF8);
           string json = await reader.ReadToEndAsync();
 
@@ -227,7 +227,7 @@ namespace VPilotNetCoreModule
           logger.Log(LogLevel.INFO, "Handling event " + evt.Method + " with args " + evt.Args.ToString());
           handler.Invoke(evt.Args);
         }
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException)
         {
           // Expected on shutdown
           break;
@@ -253,6 +253,10 @@ namespace VPilotNetCoreModule
         {
           var listType = typeof(List<>).MakeGenericType(property.PropertyType.GetGenericArguments()[0]);
           value = ((JArray)value).ToObject(listType);
+        }
+        else if (property.PropertyType.IsArray && property.PropertyType.GetElementType() == typeof(int))
+        {
+          value = ((JArray) value).ToObject<int[]>();
         }
         else if (value is Int64)
           value = Convert.ToInt32(value);

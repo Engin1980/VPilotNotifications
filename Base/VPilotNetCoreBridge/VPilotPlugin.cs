@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using RossCarlson.Vatsim.Vpilot.Plugins;
@@ -28,7 +29,12 @@ namespace VPilotNetCoreBridge
     public void Initialize(IBroker broker)
     {
       logger.Clear();
-      logger.Log(Logger.LogLevel.Info, "Initializing VPilotPlugin...");
+      {
+        string ver = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
+        FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+        string fileVer = fvi.FileVersion;
+        logger.Log(Logger.LogLevel.Info, $"Initializing VPilotPlugin (ver {ver}/{fileVer})...");
+      }
 
       if (LoadConfig(out Config config) == Result.Error)
       {
@@ -49,6 +55,16 @@ namespace VPilotNetCoreBridge
       this.serverProxy = new ServerProxy(config.PipeId, config.ProcessAircraftRelatedEvents, broker);
 
       logger.Log(Logger.LogLevel.Info, "Initialization completed.");
+
+      this.broker.NetworkConnected += DoDebug;
+    }
+
+    private void DoDebug(object sender, RossCarlson.Vatsim.Vpilot.Plugins.Events.NetworkConnectedEventArgs e)
+    {
+      Thread.Sleep(1000); // Give the client some time to connect
+      //serverProxy.DebugSendContactMe();
+      serverProxy.DebugSendRadioMessage("LKMT");
+
     }
 
     private Result StartClient(Config config)
@@ -63,7 +79,6 @@ namespace VPilotNetCoreBridge
       {
         psi.UseShellExecute = false;
         psi.CreateNoWindow = true;
-        psi.WorkingDirectory = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
       }
 
       Process p = new Process()

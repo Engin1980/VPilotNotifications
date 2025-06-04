@@ -27,7 +27,6 @@ namespace VPilotNetAlert.Vatsim
 
     public record FlightPlanUpdatedEventArgs(FlightPlan? Previous, FlightPlan? Current);
     public delegate void FlightPlanUpdatedHandler(FlightPlanUpdatedEventArgs e);
-    public event FlightPlanUpdatedHandler? FlightPlanUpdated;
     public FlightPlan? CurrentFlightPlan { get; private set; }
 
     public VatsimFlightPlanProvider(ClientProxyBroker broker, VatsimConfig settings)
@@ -69,17 +68,11 @@ namespace VPilotNetAlert.Vatsim
     {
       logger.Log(LogLevel.INFO, "UpdateFlightPlan called.");
 
-      FlightPlan? previousFlightPlan = CurrentFlightPlan;
       int? vatsimId = VatsimId;
       if (vatsimId == null || vatsimId <= 0)
         EraseFlightPlan();
       else
         await ReloadFlightPlanAsync(vatsimId.Value);
-
-      if (this.CurrentFlightPlan != previousFlightPlan)
-      {
-        FlightPlanUpdated?.Invoke(new FlightPlanUpdatedEventArgs(previousFlightPlan, this.CurrentFlightPlan));
-      }
 
       if (vatsimId != null)
       {

@@ -13,7 +13,6 @@ namespace VPilotNetAlert.Tasks
   internal class ImportantRadioMessageAlertTask : AbstractTask
   {
     private string connectedCallsign = string.Empty;
-    private Vatsim.FlightPlan? flightPlan;
     private readonly ImportantRadioMessageConfig config;
 
     public ImportantRadioMessageAlertTask(TaskInitData data, ImportantRadioMessageConfig config) : base(data)
@@ -26,7 +25,6 @@ namespace VPilotNetAlert.Tasks
       this.Broker.NetworkConnected += (s, e) => this.connectedCallsign = e.Callsign.ToUpperInvariant();
       this.Broker.NetworkDisconnected += (s, e) => this.connectedCallsign = string.Empty;
       this.Broker.RadioMessageReceived += Broker_RadioMessageReceived;
-      this.VatsimFlightPlanProvider.FlightPlanUpdated += e => this.flightPlan = e.Current;
 
       Logger.Log(LogLevel.DEBUG, $"ImportantRadioMessageAlertTask initialized.");
     }
@@ -45,16 +43,16 @@ namespace VPilotNetAlert.Tasks
     {
       message = message.ToUpper();
       bool ret = false;
-      if (message.Contains(this.connectedCallsign))
+      if (message.Contains(this.connectedCallsign.ToUpper()))
         ret = true;
       else
       {
-        var fd = this.flightPlan;
+        var fd = this.VatsimFlightPlanProvider.CurrentFlightPlan;
         if (fd != null)
         {
-          if (message.Contains(fd.Departure))
+          if (message.Contains(fd.Departure.ToUpper()))
             ret = true;
-          else if (message.Contains(fd.Arrival))
+          else if (message.Contains(fd.Arrival.ToUpper()))
             ret = true;
         }
       }

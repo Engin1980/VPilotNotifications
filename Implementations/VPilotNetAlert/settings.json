@@ -1,17 +1,26 @@
 {
   "Logging": {
+    "FileName": "_vpilotalert.log",
     "Rules": [
       {
         "Pattern": "WinHandleManager",
         "Level": "WARNING"
       },
       {
-        "Pattern": "ESimConnect.+",
+        "Pattern": "ESimConnect.*",
+        "Level": "WARNING"
+      },
+      {
+        "Pattern": "VatsimModelDownloader",
         "Level": "WARNING"
       },
       {
         "Pattern": "ClientProxyBroker",
-        "Level": "WARNING"
+        "Level": "INFO"
+      },
+      {
+        "Pattern": "DisconnectedTask",
+        "Level": "DEBUG"
       },
       {
         "Pattern": ".*",
@@ -22,18 +31,18 @@
   "Tasks": {
     "ContactMe": {
       "Enabled": true,
-      "FrequencyRegex": "^Contact me.+(1\\d{2}[\\\\.,]\\d+)$",
-      "RepeatSoundInterval": 30,
+      "FrequencyRegex": "^Contact me.+(1\\d{2}[\\.\\,]\\d+)",
+      "RepeatSoundInterval": 5,
       "AudioFile": {
-        "Name": "Sounds\\ring.mp3",
+        "Name": "Sounds\\contactMe.mp3",
         "Volume": 1
       }
     },
     "NoFlightPlan": {
-      "Enabled": true,
+      "Enabled": false,
       "DetectionOnParkingBrake": true,
       "DetectionOnHeight": 3000,
-      "DetectionInterval": 60,
+      "DetectionOnHeightInterval": 180,
       "AudioFile": {
         "Name": "Sounds\\noFlightPlan.mp3",
         "Volume": 1
@@ -47,10 +56,10 @@
       }
     },
     "Disconnected": {
-      "Enabled": true,
+      "Enabled": false,
       "RepeatInterval": 10,
       "AudioFile": {
-        "Name": "Sounds\\disconnect.mp3",
+        "Name": "Sounds\\disconnected.mp3",
         "Volume": 1
       }
     }

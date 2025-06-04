@@ -2,6 +2,7 @@
 using ESystem.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -28,12 +29,12 @@ namespace VPilotNetAlert.Tasks
       }
     }
 
-    private bool isNetworkConnected = false;
     private ContactMeData? data = null;
-    private System.Timers.Timer checkTimer;
+    private readonly System.Timers.Timer checkTimer;
     private readonly ContactMeConfig config;
     private readonly TypeId[] comFrequencyTypeId;
     private readonly TypeId[] comReceivingTypeId;
+    private readonly CultureInfo enUS = System.Globalization.CultureInfo.GetCultureInfo("en-US");
 
     public ContactMeTask(TaskInitData data, ContactMeConfig config) : base(data)
     {
@@ -41,8 +42,6 @@ namespace VPilotNetAlert.Tasks
       this.config = config ?? throw new ArgumentNullException(nameof(config), "ContactMeConfig cannot be null.");
 
       Logger.Log(LogLevel.DEBUG, "Registering event handlers for network and radio messages.");
-      data.Broker.NetworkConnected += (s, e) => this.isNetworkConnected = true;
-      data.Broker.NetworkDisconnected += (s, e) => this.isNetworkConnected = false;
       data.Broker.PrivateMessageReceived += Broker_PrivateMessageReceived;
       Logger.Log(LogLevel.DEBUG, "Event handlers registered.");
 
@@ -68,6 +67,13 @@ namespace VPilotNetAlert.Tasks
 
     private void CheckTimer_Elapsed(object? sender, ElapsedEventArgs e)
     {
+      if (base.IsConnected == false)
+      {
+        checkTimer.Stop();
+        this.data = null;
+        return;
+      }
+
       Logger.Log(LogLevel.DEBUG, "CheckTimer elapsed. Checking radio tuning and ContactMe data.");
       CheckRadioTuning();
       if (this.data == null)
@@ -91,7 +97,7 @@ namespace VPilotNetAlert.Tasks
       for (int i = 0; i < 3; i++)
       {
         double freq = this.ESimWrapper.ValueCache.GetValue(comFrequencyTypeId[i]);
-        freq = freq / 100000; // convert from BCD format to MHz (e.g., 127850000 to 127.85 MHz)
+        freq = freq / 1000000; // convert from BCD format to MHz (e.g., 127850000 to 127.85 MHz)
         double receiving = this.ESimWrapper.ValueCache.GetValue(comReceivingTypeId[i]);
         Logger.Log(LogLevel.TRACE, $"Checking COM{i + 1}: Frequency = {freq} MHz, Receiving = {receiving}");
         if (freq == this.data.Frequency && receiving > 0.5)
@@ -112,12 +118,6 @@ namespace VPilotNetAlert.Tasks
         return;
       }
 
-      if (isNetworkConnected == false)
-      {
-        Logger.Log(LogLevel.WARNING, "Network is not connected. Cannot process radio messages.");
-        return;
-      }
-
       Logger.Log(LogLevel.INFO, $"Detected 'Contact me' message from {e.From} with frequency {frequency} MHz.");
       this.data = new ContactMeData(frequency);
       this.checkTimer.Start();
@@ -126,18 +126,18 @@ namespace VPilotNetAlert.Tasks
     private bool IsContactMeMessage(PrivateMessageReceivedEventArgs e, out double frequency)
     {
       string msg = e.Message;
+
       Regex regex = new(config.FrequencyRegex);
       MatchCollection matches = regex.Matches(msg);
       if (matches.Count > 0)
       {
         string frequencyGroup = matches[0].Groups[1].Value;
         frequencyGroup = frequencyGroup.Replace(",", ".");
-        if (double.TryParse(frequencyGroup, out frequency) == false)
+        if (double.TryParse(frequencyGroup, NumberStyles.Float, enUS, out frequency))
           return true;
         else
         {
-          this.Logger.Log(LogLevel.ERROR, $"Detected 'Contact me' message, but unable to parse frequency from '{frequencyGroup}' in message '{msg}'.");
-          return false;
+          this.Logger.Log(LogLevel.ERROR, $"Detected XX 'Contact me' message, but unable to parse frequency from '{frequencyGroup}' in message '{msg}'.");
         }
       }
       frequency = double.NaN;

@@ -24,7 +24,7 @@ namespace VPilotNetAlert.Tasks
       Logger.Log(LogLevel.INFO, "DisconnectedTask initializing.");
 
       this.config = config;
-      this.checkTimer = new System.Timers.Timer(30000)
+      this.checkTimer = new System.Timers.Timer(config.RepeatInterval * 1000)
       {
         AutoReset = true,
         Enabled = false,

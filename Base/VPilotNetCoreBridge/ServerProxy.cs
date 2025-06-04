@@ -229,5 +229,28 @@ namespace VPilotNetCoreBridge
       try { methodListeningTask.Wait(); } catch { /* ignore */ }
       methodListeningTaskCancelationTokenSource.Dispose();
     }
+
+    internal void DebugSendContactMe()
+    {
+      PrivateMessageReceivedEventArgs e = new PrivateMessageReceivedEventArgs()
+      {
+        From = "DEBUG",
+        Message = "Contact me on at 123.450"
+      };
+      HandleInvokedEvent(nameof(IBroker.PrivateMessageReceived), e);
+    }
+
+    internal void DebugSendRadioMessage(string v)
+    {
+      int[] freqs = new int[1];
+      freqs[0] = 12344500; // Example frequency in Hz
+      RadioMessageReceivedEventArgs e = new RadioMessageReceivedEventArgs()
+      {
+        Frequencies = freqs,
+        From = "DEBUG",
+        Message = "hudla prdla " + v + " smudla dudla"
+      };
+      HandleInvokedEvent(nameof(IBroker.RadioMessageReceived), e);
+    }
   }
 }

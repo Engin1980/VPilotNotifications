@@ -17,9 +17,17 @@ namespace VPilotNetAlert.Tasks
     protected Logger Logger { get; init; }
     protected VatsimFlightPlanProvider VatsimFlightPlanProvider { get; init; }
     protected ESimWrapper ESimWrapper { get; init; }
+    protected bool IsConnected { get; private set; } = false;
 
     protected void SendSystemPrivateMessage(string message)
     {
+      if (!IsConnected)
+      {
+        Logger.Log(LogLevel.ERROR, "Unable to send private message when not connected. Message: " + message);
+        return;
+      }
+
+      Logger.Log(LogLevel.DEBUG, "Sending SYSTEM private message: " + message);
       EAssert.IsNotNull(message, nameof(message));
       this.Broker.SendPrivateMessage(Program.SENDER, message);
     }
@@ -36,6 +44,9 @@ namespace VPilotNetAlert.Tasks
       this.VatsimFlightPlanProvider = data.VatsimFlightPlanProvider;
       this.ESimWrapper = data.ESimWrapper;
       this.Logger = Logger.Create(GetType().Name);
+
+      this.Broker.NetworkConnected += (s, e) => this.IsConnected = true;
+      this.Broker.NetworkDisconnected += (s, e) => this.IsConnected = false;
     }
   }
 }
