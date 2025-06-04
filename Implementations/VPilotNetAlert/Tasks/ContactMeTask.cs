@@ -1,4 +1,6 @@
-﻿using ESimConnect;
+﻿using Eng.VPilotNetCoreModule;
+using Eng.VPilotNotifications.Settings;
+using ESimConnect;
 using ESystem.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,10 +12,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
-using VPilotNetAlert.Settings;
-using VPilotNetCoreModule;
 
-namespace VPilotNetAlert.Tasks
+namespace Eng.VPilotNotifications.Tasks
 {
   internal class ContactMeTask : AbstractTask
   {

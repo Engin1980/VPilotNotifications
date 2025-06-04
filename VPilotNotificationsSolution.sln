@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NET_CORE_6", "_NET_CORE_6"
 		_DLLs\_NET_CORE_6\ESystem.pdb = _DLLs\_NET_CORE_6\ESystem.pdb
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNetAlert", "Implementations\VPilotNetAlert\VPilotNetAlert.csproj", "{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNotifications", "Implementations\VPilotNetAlert\VPilotNotifications.csproj", "{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementations", "Implementations", "{3F5F92D7-E66C-4FC6-B048-34F81F4B187C}"
 EndProject

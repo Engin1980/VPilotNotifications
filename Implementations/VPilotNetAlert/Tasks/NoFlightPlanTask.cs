@@ -1,4 +1,5 @@
-﻿using ESimConnect;
+﻿using Eng.VPilotNotifications.Settings;
+using ESimConnect;
 using ESimConnect.Extenders;
 using ESystem.Asserting;
 using ESystem.Logging;
@@ -8,9 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
-using VPilotNetAlert.Settings;
 
-namespace VPilotNetAlert.Tasks
+namespace Eng.VPilotNotifications.Tasks
 {
   internal class NoFlightPlanTask : AbstractTask
   {

@@ -1,4 +1,7 @@
-﻿using ESystem;
+﻿using Eng.VPilotNotifications.Settings;
+using Eng.VPilotNotifications.Tasks;
+using Eng.VPilotNotifications.Vatsim;
+using ESystem;
 using ESystem.Asserting;
 using ESystem.Json;
 using ESystem.Logging;
@@ -11,12 +14,9 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Interop;
-using VPilotNetAlert.Settings;
-using VPilotNetAlert.Tasks;
-using VPilotNetAlert.Vatsim;
 using static ESimConnect.Definitions.SimUnits;
 
-namespace VPilotNetAlert
+namespace Eng.VPilotNotifications
 {
   internal class Program
   {

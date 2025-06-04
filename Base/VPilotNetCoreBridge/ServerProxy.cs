@@ -15,7 +15,7 @@ using RossCarlson.Vatsim.Vpilot.Plugins;
 using System.Diagnostics.SymbolStore;
 //using VPilotNetCoreBridge.Mock;
 
-namespace VPilotNetCoreBridge
+namespace Eng.VPilotNetCoreBridge
 {
   internal class ServerProxy : IDisposable
   {

@@ -6,13 +6,15 @@ Console.WriteLine("NAudio, Hello, World!");
 string file = @"..\..\..\..\..\Implementations\VPilotNetAlert\Sounds\disconnected.mp3";
 string absFile = System.IO.Path.GetFullPath(file);
 
-WaveStream mainOutputStream = new Mp3FileReader(file);
-WaveChannel32 volumeStream = new(mainOutputStream);
-WaveOutEvent player = new();
-player.Init(volumeStream);
-player.Play();
+//WaveStream mainOutputStream = new Mp3FileReader(file);
+//WaveChannel32 volumeStream = new(mainOutputStream);
+//WaveOutEvent player = new();
+//player.Init(volumeStream);
+//player.Play();
 
-//PlayIII(absFile);
+PlayI(absFile);
+PlayII(absFile);
+PlayIII(absFile);
 
 //await Task.Run(() => PlayIII(absFile));
 

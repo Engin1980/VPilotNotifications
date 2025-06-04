@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VPilotNetAlert.Settings
+namespace Eng.VPilotNotifications.Settings
 {
   using System.ComponentModel.DataAnnotations;
 

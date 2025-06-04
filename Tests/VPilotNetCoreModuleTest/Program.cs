@@ -1,8 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Eng.VPilotNetCoreModule;
 using ESystem.Logging;
 using System.Linq.Expressions;
 using System.Reflection;
-using VPilotNetCoreModule;
 
 Console.WriteLine($"VPilotNetCoreModuleTest startup");
 Console.WriteLine($"Setting up logging at {Environment.CurrentDirectory}");

@@ -11,10 +11,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using VPilotNetAlert.Settings;
-using VPilotNetCoreModule;
+using Eng.VPilotNotifications.Settings;
+using Eng.VPilotNetCoreModule;
 
-namespace VPilotNetAlert.Vatsim
+namespace Eng.VPilotNotifications.Vatsim
 {
   public class VatsimFlightPlanProvider
   {

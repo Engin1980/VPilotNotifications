@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using RossCarlson.Vatsim.Vpilot.Plugins;
 //using VPilotNetCoreBridge.Mock;
 
-namespace VPilotNetCoreBridge
+namespace Eng.VPilotNetCoreBridge
 {
   public class VPilotPlugin : RossCarlson.Vatsim.Vpilot.Plugins.IPlugin, IDisposable
   {

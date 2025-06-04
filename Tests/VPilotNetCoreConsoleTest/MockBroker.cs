@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Eng.VPilotNetCoreBridge;
+using Eng.VPilotNetCoreBridge.Mock;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VPilotNetCoreBridge;
-using VPilotNetCoreBridge.Mock;
 
-namespace VPilotNetCoreBridgeTest
+namespace Eng.Tests.VPilotNetCoreBridgeTest
 {
   internal class MockBroker : IBroker
   {

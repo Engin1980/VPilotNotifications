@@ -1,4 +1,5 @@
-﻿using ESystem.Asserting;
+﻿using Eng.VPilotNotifications.Settings;
+using ESystem.Asserting;
 using ESystem.Logging;
 using System;
 using System.Collections.Generic;
@@ -7,10 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
-using VPilotNetAlert.Settings;
-using VPilotNetCoreModule;
 
-namespace VPilotNetAlert.Tasks
+namespace Eng.VPilotNotifications.Tasks
 {
   internal class DisconnectedTask : AbstractTask
   {

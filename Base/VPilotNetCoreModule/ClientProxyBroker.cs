@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VPilotNetCoreModule
+namespace Eng.VPilotNetCoreModule
 {
   public class ClientProxyBroker : IProxyBroker
   {

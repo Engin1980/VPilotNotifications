@@ -1,4 +1,6 @@
-﻿using ESystem.Asserting;
+﻿using Eng.VPilotNetCoreModule;
+using Eng.VPilotNotifications.Vatsim;
+using ESystem.Asserting;
 using ESystem.Logging;
 using System;
 using System.Collections.Generic;
@@ -6,10 +8,8 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
-using VPilotNetAlert.Vatsim;
-using VPilotNetCoreModule;
 
-namespace VPilotNetAlert.Tasks
+namespace Eng.VPilotNotifications.Tasks
 {
   internal abstract class AbstractTask
   {

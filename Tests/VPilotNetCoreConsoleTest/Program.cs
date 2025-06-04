@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Eng.VPilotNetCoreBridge;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VPilotNetCoreBridge;
 
-namespace VPilotNetCoreBridgeTest
+namespace Eng.Tests.VPilotNetCoreBridgeTest
 {
   internal class Program
   {
@@ -46,7 +46,7 @@ namespace VPilotNetCoreBridgeTest
       //  Longitude = 17.71
       //});
 
-      System.Threading.Thread.Sleep(50000);
+      // System.Threading.Thread.Sleep(50000);
     }
   }
 }

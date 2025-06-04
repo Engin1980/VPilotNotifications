@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace VPilotNetCoreBridge
+namespace Eng.VPilotNetCoreBridge
 {
   public class Logger
   {

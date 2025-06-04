@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VPilotNetAlert.Vatsim
+namespace Eng.VPilotNotifications.Vatsim
 {
   public class FlightPlan
   {
