@@ -1,13 +1,21 @@
-A simple tool playing sound when your callsign, departure or destination airport is mentioned in [VPilot](https://vpilot.rosscarlson.dev/) communication messages.
+A simple tool adding sound **notifications** to [VPilot](https://vpilot.rosscarlson.dev/):
+* 🔊 when **your callsign, departure or destination airport is mentioned in radio communication**;
+* 🔊 when **contact me ...** message was received but frequency were not tuned;
+* 🔊 while **disconnected**;
+* 🔊 when **departing without filled VATSIM FlightPlan**.
 
 **Why** Cos I made an airprox with KLM1277 at EGPH, moreover occusing him for not using UNICOM. I overlooked the message in the mess of other chatting. My big apologies.
 
 # Installation
 
-VPilot must be installed prior the plugin installation.
+VPilot must be installed **prior** the plugin installation. This tool is tested only on case when VPilot is running at the same computer as the Flight Simulator.
+
+To obtain the tool:
 
 1. Go to the [Releases](https://github.com/Engin1980/VPilotMessageAlert/releases) page and download the latest ZIP archive.
 2. Extract the archive content into the `Plugins` folder in __VPilot__ instalation. Note that all the files must be placed directly into the `Plugins` folder, not in any subfolder
+
+The tool is build based on .NET Framework 4.7.2 (which is used by VPilot by default, so if you are using VPilot, you should be fine) and .NET 6 (which is installed on Windows 10+ devices by default).
 
 # Validating instalation
 Ensure you are using the default `settings.json` file.
@@ -19,8 +27,8 @@ Ensure you are using the default `settings.json` file.
 
 If not, go to the `...\vpilot\plugins` folder and open the `_log.txt` file for any errors.
 
-# Setting up
-The connection info and flightplan is automatically read from the VPilot connection and online Vatsim data. However, you can adjust the sounds and monitored events and update intervals. All the settings are available in the file `settings.json`.
+# Setting up (optional)
+The connection info and flightplan is automatically read from the VPilot connection and online Vatsim data. However, you can adjust the sounds and monitored events and update intervals. All the settings are available in the configuration file at `...\VPilot\Plugins\VPilotNetAlert\settings.json`.
 
 # Usage
 Once added into the `Plugins` folder, there is no additional set up. Just start VPilot and connect into the network. However, you can adjust settings - see the previous section.
@@ -30,6 +38,11 @@ Once added into the `Plugins` folder, there is no additional set up. Just start 
 For any issue, feel free to raise a new issue at the [Issues](https://github.com/Engin1980/fs2020-com-to-vpilot-volume/issues) tab.
 
 # Version history
+
+**v2.0 - 2025-06-0**
+* Internally completely rebuild to support readouts from Flight Simulator
+* Added support for no-flight-plan warning
+* Added support for contact-me warning
 
 **v1.1 - 2024-07-23**
 * Repetitive disconnected warning.

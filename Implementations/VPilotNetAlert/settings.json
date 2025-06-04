@@ -67,7 +67,7 @@
     "ImportantRadioMessage": {
       "Enabled": true,
       "AudioFile": {
-        "Name": "Sounds\\bell.mp3",
+        "Name": "Sounds\\radioTextMessage.mp3",
         "Volume": 1
       }
     },
