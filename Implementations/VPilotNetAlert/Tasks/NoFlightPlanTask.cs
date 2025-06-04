@@ -1,4 +1,5 @@
-﻿using Eng.VPilotNotifications.Settings;
+﻿using Eng.VPilotNetCoreModule;
+using Eng.VPilotNotifications.Settings;
 using ESimConnect;
 using ESimConnect.Extenders;
 using ESystem.Asserting;
@@ -14,6 +15,7 @@ namespace Eng.VPilotNotifications.Tasks
 {
   internal class NoFlightPlanTask : AbstractTask
   {
+    private const int WAIT_TIME_TO_DOWNLOAD_FLIGHT_PLAN = 5000;
     private readonly NoFlightPlanConfig config;
     private readonly System.Timers.Timer heightCheckTimer;
     private readonly TypeId parkingBrakeTypeId;
@@ -35,6 +37,8 @@ namespace Eng.VPilotNotifications.Tasks
       };
       this.heightCheckTimer.Elapsed += CheckTimer_Elapsed;
 
+      if (this.config.DetectionOnConnection)
+        this.Broker.NetworkConnected += Broker_FlightPlanDetectionOnConnection;
       this.Broker.NetworkConnected += (s, e) => this.heightCheckTimer.Enabled = true;
       this.Broker.NetworkDisconnected += (s, e) => this.heightCheckTimer.Enabled = false;
 
@@ -45,6 +49,23 @@ namespace Eng.VPilotNotifications.Tasks
       Logger.Log(LogLevel.DEBUG, $"Registered TypeIds: {parkingBrakeTypeId}, {heightTypeId}");
 
       Logger.Log(LogLevel.INFO, $"NoFlightPlanTask initialized.");
+    }
+
+    private void Broker_FlightPlanDetectionOnConnection(object? sender, NetworkConnectedEventArgs e)
+    {
+      void testFlightPlanOnConnection()
+      {
+        Thread.Sleep(WAIT_TIME_TO_DOWNLOAD_FLIGHT_PLAN);
+        var fp = this.VatsimFlightPlanProvider.CurrentFlightPlan;
+        if (fp == null)
+        {
+          Logger.Log(LogLevel.INFO, "No flight plan detected on connection. Playing alert sound.");
+          base.SendSystemPrivateMessage("No flight plan detected. Please file a flight plan before takeoff.");
+          Audio.PlayAudioFile(this.config.AudioFile.Name, this.config.AudioFile.Volume);
+        }
+      }
+
+      Task.Run(testFlightPlanOnConnection);
     }
 
     private void ValueCache_ValueChanged(ValueCacheExtender.ValueChangeEventArgs e)

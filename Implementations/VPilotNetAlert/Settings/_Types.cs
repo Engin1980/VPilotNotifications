@@ -63,6 +63,7 @@ namespace Eng.VPilotNotifications.Settings
   {
     public bool Enabled { get; set; }
     [Range(1, int.MaxValue)]
+    public bool DetectionOnConnection { get; set; } = true;
     public bool DetectionOnParkingBrake { get; set; } = true;
 
     [Range(1, int.MaxValue)]

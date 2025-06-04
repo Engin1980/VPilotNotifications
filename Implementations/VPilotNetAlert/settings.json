@@ -57,6 +57,7 @@
     "NoFlightPlan": {
       "Enabled": true,
       "DetectionOnParkingBrake": true,
+      "DetectionOnConnection": true,
       "DetectionOnHeight": 3000,
       "DetectionOnHeightInterval": 180,
       "AudioFile": {
