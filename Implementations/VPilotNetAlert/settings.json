@@ -20,19 +20,23 @@
       },
       {
         "Pattern": "DisconnectedTask",
-        "Level": "DEBUG"
+        "Level": "INFO"
       },
       {
         "Pattern": "ContactMeTask",
-        "Level": "DEBUG"
+        "Level": "INFO"
       },
       {
         "Pattern": "ImportantRadioMessageAlertTask",
-        "Level": "DEBUG"
+        "Level": "INFO"
       },
       {
         "Pattern": "NoFlightPlanTask",
-        "Level": "DEBUG"
+        "Level": "INFO"
+      },
+      {
+        "Pattern": "VPilotNetAlert.Program",
+        "Level": "INFO"
       },
       {
         "Pattern": ".*",
@@ -51,7 +55,7 @@
       }
     },
     "NoFlightPlan": {
-      "Enabled": false,
+      "Enabled": true,
       "DetectionOnParkingBrake": true,
       "DetectionOnHeight": 3000,
       "DetectionOnHeightInterval": 180,
@@ -68,7 +72,7 @@
       }
     },
     "Disconnected": {
-      "Enabled": false,
+      "Enabled": true,
       "RepeatInterval": 30,
       "AudioFile": {
         "Name": "Sounds\\disconnected.mp3",

@@ -219,6 +219,7 @@ namespace VPilotNetCoreModule
 
     private async Task DoEventListening(CancellationToken token)
     {
+      logger.Log(LogLevel.INFO, "Starting event listening task for pipe " + this.pipeID + "ProxyEventPipe");
       while (!token.IsCancellationRequested)
       {
         try
@@ -250,6 +251,7 @@ namespace VPilotNetCoreModule
           await Task.Delay(1000, token); // prevent tight loop on error
         }
       }
+      logger.Log(LogLevel.INFO, "Event listening task has been cancelled or completed.");
     }
 
     private T BuildObject<T>(Dictionary<string, object> args) where T : new()
@@ -350,6 +352,12 @@ namespace VPilotNetCoreModule
       logger.LogMethodStart();
       Dictionary<string, object> args = BuildArgsDictionary(nameof(pressed), pressed);
       SendViaPipe(nameof(SetPtt), args);
+    }
+
+    public void CloseBroker()
+    {
+      logger.Log(LogLevel.INFO, "Broker close invoked.");
+      eventListeningTaskCancelationTokenSource.Cancel();
     }
   }
 }

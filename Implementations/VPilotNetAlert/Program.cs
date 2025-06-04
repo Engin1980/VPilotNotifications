@@ -30,11 +30,12 @@ namespace VPilotNetAlert
     private static Config config = null!;
     private static readonly object LOG_FILE_LOCK = new object();
     private static string? logFileName = null;
+    private static readonly Object EXIT_LOCK = new object();
 
     static void Main(string[] args)
     {
       Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-      
+
       InitLogging();
 
       LoadConfig();
@@ -84,12 +85,23 @@ namespace VPilotNetAlert
 
 
       // main run loop
-      logger.Log(LogLevel.INFO, "Entering main app loop...");
-      broker.SessionEnded += (s, e) => IsSupposedToClose = true;
-      while (!IsSupposedToClose)
+      logger.Log(LogLevel.INFO, "Entering main app loop wait...");
+      broker.SessionEnded += (s, e) =>
       {
-        Thread.Sleep(5000);
+        lock (EXIT_LOCK)
+        {
+          Monitor.Pulse(EXIT_LOCK);
+        }
+      };
+      lock (EXIT_LOCK)
+      {
+        Monitor.Wait(EXIT_LOCK);
       }
+      logger.Log(LogLevel.DEBUG, "Closing broker");
+      broker.CloseBroker();
+      logger.Log(LogLevel.DEBUG, "Closing ESimConnect");
+      eSimWrapper.ESimConnect.Close();
+      logger.Log(LogLevel.INFO, "Main app loop ended. Exiting application.");
     }
 
     private static void InitLogging()
