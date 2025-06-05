@@ -15,15 +15,16 @@ This tool is a *plugin* for [VPilot](https://vpilot.rosscarlson.dev/) connecting
 To obtain the tool:
 
 1. Go to the [Releases](https://github.com/Engin1980/VPilotNotifications/releases) page and download the latest ZIP archive.
-2. Extract the archive `Plugins` folder content into the `Plugins` folder of __VPilot__ installation. Note that all the files must be placed directly into the `Plugins` folder, not in any subfolder
+2. (If using Windows ZIP extractor) Open _Properties_ of the ZIP archive file (context menu via right button, last item), and press `Unblock` button ([how](https://singularlabs.com/tips/how-to-unblock-a-zip-file-on-windows-10/), [why](https://superuser.com/questions/302146/can-i-stop-windows-from-blocking-zip-files#1870635)).
+3. Extract the archive `Plugins` folder content into the `Plugins` folder of __VPilot__ installation. Note that all the files must be placed directly into the `Plugins` folder, not in any subfolder
 
 The tool is based on .NET Framework 4.7.2 (which is used by VPilot by default, so if you are using VPilot, you should be fine) and .NET 6 (which is installed on Windows 10+ devices by default).
 
 **Final check** You should have 
 * `...\VPilot\Plugins\VPilotNetCoreBridge.dll` and 
-* `...\VPilot\Plugins\VPilotNotifications\VPilotNotification.exe` files 
+* `...\VPilot\Plugins\VPilotNotifications\VPilotNotification.exe` 
 
-... where `...\VPilot` represents VPilot installation folder.
+... files, where `...\VPilot` represents VPilot installation folder.
 
 # ✓ Validating installation
 Ensure you are using the default `settings.json` file.
@@ -50,6 +51,9 @@ Once added to the `Plugins` folder, there is no additional set-up. Just start VP
 For any issue, feel free to raise a new issue at the [Issues](https://github.com/Engin1980/VPilotNotifications/issues) tab. Please add the relevant content of the `log` files if relevant.
 
 # Version history
+
+**v2.0 rev 1 - 2025-06-04**
+* BugFix: Incorrect behavior if VPilot started before FS is fully initialized.
 
 **v2.0 - 2025-06-04**
 * Internally completely rebuilt to support readouts from Flight Simulator

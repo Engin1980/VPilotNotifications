@@ -215,6 +215,21 @@
             Opens ESimConnect in background (in repeated attempts), invokes event once the opening is successfull.
             </summary>
         </member>
+        <member name="T:ESimConnect.Extenders.OpenInBackgroundExtender.OnOpenActionRepeatMode">
+            <summary>
+            Defines how the action is invoked when ESimConnect is opened.
+            </summary>
+        </member>
+        <member name="F:ESimConnect.Extenders.OpenInBackgroundExtender.OnOpenActionRepeatMode.FirstOnly">
+            <summary>
+            Specifies whether the action should be invoked only once when ESimConnect is opened/connected for the first time.
+            </summary>
+        </member>
+        <member name="F:ESimConnect.Extenders.OpenInBackgroundExtender.OnOpenActionRepeatMode.Always">
+            <summary>
+            Specifies whether the action should be invoked always when ESimConnect is opened/connected..
+            </summary>
+        </member>
         <member name="E:ESimConnect.Extenders.OpenInBackgroundExtender.Opened">
             <summary>
             Invoked when ESimConnect is opened.
@@ -243,11 +258,29 @@
             <param name="initialDelayInMs">Initial delay before first opening attempt.</param>
             <param name="repeatedAttemptDelayInMs">Delay after unsuccessful attempt.</param>
         </member>
-        <member name="M:ESimConnect.Extenders.OpenInBackgroundExtender.OpenInBackground(System.Action)">
+        <member name="M:ESimConnect.Extenders.OpenInBackgroundExtender.InvokeWhenConnected(System.Action,ESimConnect.Extenders.OpenInBackgroundExtender.OnOpenActionRepeatMode)">
             <summary>
-            Starts opening in background. Non-blocking call. If ESimConnect is opened, then event is invoked.
+            Invokes the specified action when the connection is established, based on the specified repeat mode.
             </summary>
-            <param name="onStarted">Additional content invoked after successfull open (alternating option to 'Opened' event).</param>
+            <remarks>If the connection is already established when this method is called, the action is executed
+            immediately on a separate task. Otherwise, the action is queued to be executed based on the specified repeat
+            mode.</remarks>
+            <param name="action">The action to invoke when the connection is established. Cannot be <see langword="null"/>.</param>
+            <param name="mode">Specifies the repeat mode for the action. Use <see cref="F:ESimConnect.Extenders.OpenInBackgroundExtender.OnOpenActionRepeatMode.Always"/> to invoke the action
+            every time the connection is established,  or <see cref="F:ESimConnect.Extenders.OpenInBackgroundExtender.OnOpenActionRepeatMode.FirstOnly"/> to invoke the
+            action only the first time the connection is established.</param>
+        </member>
+        <member name="M:ESimConnect.Extenders.OpenInBackgroundExtender.OpenRepeatedlyUntilSuccess">
+            <summary>
+            Starts connecting in background. Non-blocking call. If ESimConnect is opened, then event is invoked.
+            </summary>
+        </member>
+        <member name="M:ESimConnect.Extenders.OpenInBackgroundExtender.OpenRepeatedlyUntilSuccess(System.Action,ESimConnect.Extenders.OpenInBackgroundExtender.OnOpenActionRepeatMode)">
+            <summary>
+            Starts connecting in background. Non-blocking call. If ESimConnect is opened, then event is invoked.
+            </summary>
+            <param name="onOpenedAction">Action to invoke when ESimConnect is opened.</param> -->
+            <param name="mode">Mode of invoking action when ESimConnect is opened.</param>
         </member>
         <member name="T:ESimConnect.Extenders.SimTimeExtender">
             <summary>

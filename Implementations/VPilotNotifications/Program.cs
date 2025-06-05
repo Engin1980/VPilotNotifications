@@ -28,9 +28,9 @@ namespace Eng.VPilotNotifications
     private static readonly Logger logger = Logger.Create("VPilotNotifications.Main");
     private static VatsimFlightPlanProvider vatsimDataProvider = null!;
     private static Config config = null!;
-    private static readonly object LOG_FILE_LOCK = new object();
+    private static readonly object LOG_FILE_LOCK = new();
     private static string? logFileName = null;
-    private static readonly Object EXIT_LOCK = new object();
+    private static readonly object EXIT_LOCK = new();
 
     static void Main(string[] args)
     {
@@ -76,12 +76,20 @@ namespace Eng.VPilotNotifications
       static void initTasks()
       {
         logger.Log(LogLevel.INFO, "Initializing tasks...");
-        StartTasks();
-        logger.Log(LogLevel.INFO, "Initializing tasks... - completed");
+        try
+        {
+          StartTasks();
+          logger.Log(LogLevel.INFO, "Initializing tasks... - completed");
+        }
+        catch (Exception ex)
+        {
+          logger.Log(LogLevel.ERROR, $"Error during task initialization: {ex.Message}");
+        }
       }
       logger.Log(LogLevel.INFO, "Opening connection to FS...");
-      eSimWrapper.Open.OpenInBackground(initTasks);
-      logger.Log(LogLevel.INFO, "Opening connection to FS... - completed");
+      eSimWrapper.Open.InvokeWhenConnected(initTasks, ESimConnect.Extenders.OpenInBackgroundExtender.OnOpenActionRepeatMode.Always);
+      eSimWrapper.Open.OpenRepeatedlyUntilSuccess();
+      logger.Log(LogLevel.INFO, "Opening connection to FS... - invoked (running in background)");
 
       // connected "message"
       broker.NetworkConnected += (s, e) =>
