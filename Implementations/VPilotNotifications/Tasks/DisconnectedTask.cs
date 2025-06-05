@@ -57,7 +57,7 @@ namespace Eng.VPilotNotifications.Tasks
       else
       {
         Logger.Log(LogLevel.INFO, "Network is disconnected. Playing warning sound.");
-        base.SendSystemPrivateMessage("Network disconnected. Please check your connection.");
+        //TOREM unable to do when disconnected: base.SendSystemPrivateMessage("Network disconnected. Please check your connection.");
         Audio.PlayAudioFile(this.config.AudioFile.Name, this.config.AudioFile.Volume);
       }
     }
