@@ -34,6 +34,7 @@ namespace Eng.VPilotNotifications.Tasks
       {
         Logger.Log(LogLevel.INFO, "Network disconnected. Starting check timer.");
         isNetworkConnected = false;
+        NotifyDisconnected();
         this.checkTimer.Start();
       };
       data.Broker.NetworkConnected += (s, e) =>
@@ -50,16 +51,16 @@ namespace Eng.VPilotNotifications.Tasks
     {
       Logger.Log(LogLevel.DEBUG, "CheckTimer elapsed. Checking network connection status.");
       if (isNetworkConnected)
-      {
         Logger.Log(LogLevel.DEBUG, "Network is connected. No action needed.");
-        return;
-      }
       else
-      {
-        Logger.Log(LogLevel.INFO, "Network is disconnected. Playing warning sound.");
-        //TOREM unable to do when disconnected: base.SendSystemPrivateMessage("Network disconnected. Please check your connection.");
-        Audio.PlayAudioFile(this.config.AudioFile.Name, this.config.AudioFile.Volume);
-      }
+        NotifyDisconnected();
+    }
+
+    private void NotifyDisconnected()
+    {
+      Logger.Log(LogLevel.INFO, "Network is disconnected. Playing warning sound.");
+      //TOREM unable to do when disconnected: base.SendSystemPrivateMessage("Network disconnected. Please check your connection.");
+      Audio.PlayAudioFile(this.config.AudioFile.Name, this.config.AudioFile.Volume);
     }
   }
 }
