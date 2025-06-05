@@ -14,7 +14,7 @@ This tool is a *plugin* for [VPilot](https://vpilot.rosscarlson.dev/) connecting
 
 To obtain the tool:
 
-1. Go to the [Releases](https://github.com/Engin1980/VPilotMessageAlert/releases) page and download the latest ZIP archive.
+1. Go to the [Releases](https://github.com/Engin1980/VPilotNotifications/releases) page and download the latest ZIP archive.
 2. Extract the archive `Plugins` folder content into the `Plugins` folder of __VPilot__ installation. Note that all the files must be placed directly into the `Plugins` folder, not in any subfolder
 
 The tool is based on .NET Framework 4.7.2 (which is used by VPilot by default, so if you are using VPilot, you should be fine) and .NET 6 (which is installed on Windows 10+ devices by default).
@@ -47,7 +47,7 @@ Once added to the `Plugins` folder, there is no additional set-up. Just start VP
 
 # ⚠ Issues
 
-For any issue, feel free to raise a new issue at the [Issues](https://github.com/Engin1980/fs2020-com-to-vpilot-volume/issues) tab. Please add the relevant content of the `log` files if relevant.
+For any issue, feel free to raise a new issue at the [Issues](https://github.com/Engin1980/VPilotNotifications/issues) tab. Please add the relevant content of the `log` files if relevant.
 
 # Version history
 
@@ -73,7 +73,7 @@ For any issue, feel free to raise a new issue at the [Issues](https://github.com
 
 Created by Marek Vajgl.
 
-Project pages: https://github.com/Engin1980/VPilotMessageAlert/
+Project pages: https://github.com/Engin1980/VPilotNotifications
 
 Report issues via the Issues tab on the project GitHub pages.
 

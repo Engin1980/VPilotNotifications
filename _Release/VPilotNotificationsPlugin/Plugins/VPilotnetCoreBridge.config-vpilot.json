@@ -1,6 +1,0 @@
-﻿{
-  "clientExe": "Plugins\\VPilotNotifications\\VPilotNotifications.exe",
-  "pipeId": "VPilotNotifications",
-  "showClientConsole": true,
-  "connectTimeout": 250
-}

@@ -11,6 +11,8 @@ mkdir ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications
 
 echo Copying .NET FW 4.7.2 plugin files
 xcopy /e ..\Base\VPilotNetCoreBridge\bin\debug\ ..\_Release\VPilotNotificationsPlugin\Plugins\
+xcopy ..\_DLLs\_NET_CORE_6\SimConnect.dll ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications\
+
 echo Copying .NET 6 plugin files
 xcopy /e ..\Implementations\VPilotNotifications\bin\Debug\net6.0-windows\ ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications\
 
@@ -24,8 +26,12 @@ copy ..\readme.md ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotificati
 copy ..\license ..\_Release\VPilotNotificationsPlugin
 copy ..\license ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications\
 
+echo Preparing configuration file
+del ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotnetCoreBridge.config.json
+move ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotnetCoreBridge.config-vpilot.json ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotnetCoreBridge.config.json
+
 echo Packing to ZIP
 cd ..\_Release
 tar.exe -a -c -f VPilotNotificationsPlugin.zip VPilotNotificationsPlugin
 
-rem rmdir /s /q VPilotMessageAlertRelease
+echo Done

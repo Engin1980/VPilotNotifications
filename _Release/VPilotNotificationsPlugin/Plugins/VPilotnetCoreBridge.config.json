@@ -1,6 +1,6 @@
 ﻿{
-  "clientExe": "..\\..\\..\\VPilotNetCoreModuleTest\\bin\\Debug\\net6.0\\VPilotNetCoreModuleTest.exe",
-  "pipeId": "VPilotBridge",
+  "clientExe": "Plugins\\VPilotNotifications\\VPilotNotifications.exe",
+  "pipeId": "VPilotNotifications",
   "showClientConsole": true,
   "connectTimeout": 250
 }
