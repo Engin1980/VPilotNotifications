@@ -21,8 +21,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NET_472", "_NET_472", "{CB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NET_CORE_6", "_NET_CORE_6", "{A56ADE86-D3E1-4680-9762-D62233247FE5}"
 	ProjectSection(SolutionItems) = preProject
+		_DLLs\_NET_CORE_6\ESimConnect.deps.json = _DLLs\_NET_CORE_6\ESimConnect.deps.json
+		_DLLs\_NET_CORE_6\ESimConnect.dll = _DLLs\_NET_CORE_6\ESimConnect.dll
+		_DLLs\_NET_CORE_6\ESimConnect.pdb = _DLLs\_NET_CORE_6\ESimConnect.pdb
+		_DLLs\_NET_CORE_6\ESimConnect.xml = _DLLs\_NET_CORE_6\ESimConnect.xml
 		_DLLs\_NET_CORE_6\ESystem.dll = _DLLs\_NET_CORE_6\ESystem.dll
 		_DLLs\_NET_CORE_6\ESystem.pdb = _DLLs\_NET_CORE_6\ESystem.pdb
+		_DLLs\_NET_CORE_6\Microsoft.FlightSimulator.SimConnect.dll = _DLLs\_NET_CORE_6\Microsoft.FlightSimulator.SimConnect.dll
+		_DLLs\_NET_CORE_6\SimConnect.dll = _DLLs\_NET_CORE_6\SimConnect.dll
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNotifications", "Implementations\VPilotNotifications\VPilotNotifications.csproj", "{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}"

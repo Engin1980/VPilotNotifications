@@ -18,12 +18,13 @@ namespace Eng.VPilotNotifications.Vatsim
 {
   public class VatsimFlightPlanProvider
   {
+    private record ConnectionInfo(int Cid, string Callsign);
+
     private readonly VatsimConfig settings;
     private readonly System.Timers.Timer updateTimer;
     private readonly Logger logger;
     private static volatile bool isUpdateInProgress = false;
-
-    public int? VatsimId { get; set; } = null;
+    private ConnectionInfo? connectionInfo = null;
 
     public record FlightPlanUpdatedEventArgs(FlightPlan? Previous, FlightPlan? Current);
     public delegate void FlightPlanUpdatedHandler(FlightPlanUpdatedEventArgs e);
@@ -47,12 +48,12 @@ namespace Eng.VPilotNotifications.Vatsim
 
       broker.NetworkConnected += (s, e) =>
       {
-        this.VatsimId = int.Parse(e.Cid);
+        this.connectionInfo = new ConnectionInfo(int.Parse(e.Cid), e.Callsign);
         this.InvokeUpdateFlightPlan();
       };
       broker.NetworkDisconnected += (s, e) =>
       {
-        this.VatsimId = null;
+        this.connectionInfo = null;
         this.InvokeUpdateFlightPlan();
       };
 
@@ -68,19 +69,16 @@ namespace Eng.VPilotNotifications.Vatsim
     {
       logger.Log(LogLevel.INFO, "UpdateFlightPlan called.");
 
-      int? vatsimId = VatsimId;
-      if (vatsimId == null || vatsimId <= 0)
+      ConnectionInfo? ci = this.connectionInfo;
+      if (ci == null)
         EraseFlightPlan();
       else
-        await ReloadFlightPlanAsync(vatsimId.Value);
+        await ReloadFlightPlanAsync(ci);
 
-      if (vatsimId != null)
-      {
-        this.updateTimer.Interval = this.CurrentFlightPlan == null
-          ? this.settings.NoFlightPlanUpdateInterval * 60 * 1000
-          : this.settings.RefreshFlightPlanUpdateInterval * 60 * 1000;
-        this.updateTimer.Start();
-      }
+      this.updateTimer.Interval = this.CurrentFlightPlan == null
+        ? this.settings.NoFlightPlanUpdateInterval * 60 * 1000
+        : this.settings.RefreshFlightPlanUpdateInterval * 60 * 1000;
+      this.updateTimer.Start();
     }
 
     private void EraseFlightPlan()
@@ -89,9 +87,9 @@ namespace Eng.VPilotNotifications.Vatsim
       this.CurrentFlightPlan = null;
     }
 
-    private async Task ReloadFlightPlanAsync(int vatsimId)
+    private async Task ReloadFlightPlanAsync(ConnectionInfo ci)
     {
-      logger.Log(LogLevel.DEBUG, $"VATSIM ID is set to {vatsimId}. Starting flight plan update process.");
+      logger.Log(LogLevel.DEBUG, $"VATSIM ID is set to {ci.Cid}, Callsign to {ci.Callsign}. Starting flight plan update process.");
       if (!TryGetUpdateLock())
       {
         logger.Log(LogLevel.ERROR, "Update flag did not expire. Too short updating interval or something went wrong during update? Aborting.");
@@ -115,38 +113,39 @@ namespace Eng.VPilotNotifications.Vatsim
         return;
       }
 
-      FlightPlan? newFlightPlan = SelectFlightPlanByVatsimId(model, vatsimId);
+      FlightPlan? newFlightPlan = SelectFlightPlanByVatsimId(model, ci);
       if (newFlightPlan != null)
       {
-        logger.Log(LogLevel.INFO, $"Flight plan for VATSIM ID {vatsimId} found. Setting it as current flight plan.");
+        logger.Log(LogLevel.INFO, $"Flight plan for VATSIM ID {ci.Cid} found: {ci.Callsign} :: {newFlightPlan.Departure} -> {newFlightPlan.Arrival}. Setting it as current flight plan.");
         this.CurrentFlightPlan = newFlightPlan;
       }
       else
       {
-        logger.Log(LogLevel.INFO, $"No flight plan update found for VATSIM ID {vatsimId}.");
+        logger.Log(LogLevel.INFO, $"No flight plan found for VATSIM ID {ci.Cid} & callsign {ci.Callsign}.");
       }
 
       ReleaseUpdateLock();
     }
 
-    private FlightPlan? SelectFlightPlanByVatsimId(Model model, int vatsimId)
+    private FlightPlan? SelectFlightPlanByVatsimId(Model model, ConnectionInfo ci)
     {
       logger.Log(LogLevel.TRACE, "Picking up flight plan from model.");
       FlightPlan? flightPlan = null;
       if (model.Pilots != null && model.Pilots.Count > 0)
       {
         logger.Log(LogLevel.TRACE, "Searching for flight plan in active pilots.");
-        var pilot = model.Pilots.FirstOrDefault(q => q.CID == vatsimId);
+        var pilot = model.Pilots.FirstOrDefault(q => q.CID == ci.Cid && q.Callsign == ci.Callsign);
         if (pilot != null)
         {
           logger.Log(LogLevel.TRACE, "Flight plan found in active pilots.");
           flightPlan = pilot.Flight_plan;
         }
       }
+
       if (flightPlan == null && model.Prefiles != null && model.Prefiles.Count > 0)
       {
         logger.Log(LogLevel.TRACE, "Searching for flight plan in prefiled plans.");
-        var prefile = model.Prefiles.FirstOrDefault(q => q.CID == vatsimId);
+        var prefile = model.Prefiles.FirstOrDefault(q => q.CID == ci.Cid && q.Callsign == ci.Callsign);
         if (prefile != null)
         {
           logger.Log(LogLevel.TRACE, "Flight plan found in prefiled plans.");
@@ -154,6 +153,12 @@ namespace Eng.VPilotNotifications.Vatsim
           flightPlan.RevisionId = -1; // Set revision ID to -1 for prefiled plans
         }
       }
+
+      if (flightPlan == null)
+        logger.Log(LogLevel.TRACE, "No flight plan found in model.");
+      else
+        logger.Log(LogLevel.TRACE, $"Flight plan found: {flightPlan.Departure} -> {flightPlan.Arrival}, Revision ID: {flightPlan.RevisionId}");
+
       return flightPlan;
     }
 
