@@ -47,7 +47,7 @@
   "Tasks": {
     "ContactMe": {
       "Enabled": true,
-      "FrequencyRegex": "^Contact me.+(1\\d{2}[\\.\\,]\\d+)",
+      "FrequencyRegex": ".*[Cc]ontact me.+(1\\d{2}[\\.\\,]\\d+)",
       "RepeatSoundInterval": 25,
       "AudioFile": {
         "Name": "Sounds\\contactMe.mp3",
