@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Forms.Design.Behavior;
 
 namespace Eng.VPilotNotifications.Tasks
 {
@@ -61,6 +62,13 @@ namespace Eng.VPilotNotifications.Tasks
         comReceivingTypeId[i] = data.ESimWrapper.ValueCache.Register($"COM RECEIVE:{i + 1}");
       }
       Logger.Log(LogLevel.DEBUG, "COM frequency and receiving TypeIds registered.");
+
+      Logger.Log(LogLevel.DEBUG, $"Checking the sound file '{config.AudioFile.Name}' for existence.");
+      if (!System.IO.File.Exists(config.AudioFile.Name))
+      {
+        Logger.Log(LogLevel.ERROR, $"Audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+        base.SendSystemPrivateMessage($"Contact-Me audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+      }
 
       Logger.Log(LogLevel.INFO, "ContactMeTask initialized.");
     }

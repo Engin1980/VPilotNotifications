@@ -48,6 +48,13 @@ namespace Eng.VPilotNotifications.Tasks
       this.ESimWrapper.ValueCache.ValueChanged += ValueCache_ValueChanged;
       Logger.Log(LogLevel.DEBUG, $"Registered TypeIds: {parkingBrakeTypeId}, {heightTypeId}");
 
+      Logger.Log(LogLevel.DEBUG, "Checking the audio file for existence.");
+      if (!System.IO.File.Exists(config.AudioFile.Name))
+      {
+        Logger.Log(LogLevel.ERROR, $"Audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+        base.SendSystemPrivateMessage($"NoFlightPlan audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+      }
+
       Logger.Log(LogLevel.INFO, $"NoFlightPlanTask initialized.");
     }
 

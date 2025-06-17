@@ -123,6 +123,8 @@ namespace Eng.VPilotNotifications.Settings
 
     [Range(1, int.MaxValue)]
     public int ConnectTimeout { get; set; }
+
+    public bool CachePrivateMessagesUntilConnected { get; set; }
   }
 
 }

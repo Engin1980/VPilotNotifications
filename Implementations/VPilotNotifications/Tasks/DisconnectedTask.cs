@@ -44,6 +44,13 @@ namespace Eng.VPilotNotifications.Tasks
         this.checkTimer.Stop();
       };
 
+      Logger.Log(LogLevel.DEBUG, "Checking the audio file for existence.");
+      if (!System.IO.File.Exists(config.AudioFile.Name))
+      {
+        Logger.Log(LogLevel.ERROR, $"Audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+        base.SendSystemPrivateMessage($"Disconnected audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+      }
+
       Logger.Log(LogLevel.INFO, "DisconnectedTask initialized.");
     }
 

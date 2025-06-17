@@ -3,6 +3,7 @@ using Eng.VPilotNotifications.Vatsim;
 using ESystem.Asserting;
 using ESystem.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
@@ -19,12 +20,26 @@ namespace Eng.VPilotNotifications.Tasks
     protected ESimWrapper ESimWrapper { get; init; }
     protected bool IsConnected { get; private set; } = false;
 
-    protected void SendSystemPrivateMessage(string message)
+    private record CachedPrivateMessage(DateTime CreatedAt, string Message);
+    private readonly ConcurrentQueue<CachedPrivateMessage> cachedPrivateMessages = new();
+
+    /// <summary>
+    /// Sends a system private message to the client. If not connected, it will cache the message if configured to do so.
+    /// </summary>
+    /// <param name="message">Message text</param>
+    protected void SendSystemPrivateMessage(string message, bool cacheUntilConnected = true)
     {
       if (!IsConnected)
       {
-        Logger.Log(LogLevel.ERROR, "Unable to send private message when not connected. Message: " + message);
-        return;
+        if (cacheUntilConnected)
+        {
+          cachedPrivateMessages.Enqueue(new CachedPrivateMessage(DateTime.Now, message));
+        }
+        else
+        {
+          Logger.Log(LogLevel.ERROR, "Unable to send private message when not connected. Message ignored. Message: " + message);
+          return;
+        }
       }
 
       Logger.Log(LogLevel.DEBUG, "Sending SYSTEM private message: " + message);
@@ -47,6 +62,19 @@ namespace Eng.VPilotNotifications.Tasks
 
       this.Broker.NetworkConnected += (s, e) => this.IsConnected = true;
       this.Broker.NetworkDisconnected += (s, e) => this.IsConnected = false;
+    }
+
+    private void Broker_NetworkConnected(object? sender, NetworkConnectedEventArgs e)
+    {
+      this.IsConnected = true;
+      Logger.Log(LogLevel.INFO, "Network connected. Sending cached private messages if any.");
+      while (cachedPrivateMessages.TryDequeue(out CachedPrivateMessage? cachedMessage))
+      {
+        if (cachedMessage != null)
+        {
+          SendSystemPrivateMessage(cachedMessage.Message);
+        }
+      }
     }
   }
 }

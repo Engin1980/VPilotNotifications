@@ -89,6 +89,7 @@
   "Global": {
     "SendPrivateMessageWhenConnectedForTheFirstTime": true,
     "SendPrivateMessageWhenFlightPlanDetected": true,
-    "ConnectTimeout": 250
+    "ConnectTimeout": 250,
+    "CachePrivateMessagesUntilConnected": true
   }
 }

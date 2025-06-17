@@ -26,6 +26,13 @@ namespace Eng.VPilotNotifications.Tasks
       this.Broker.NetworkDisconnected += (s, e) => this.connectedCallsign = string.Empty;
       this.Broker.RadioMessageReceived += Broker_RadioMessageReceived;
 
+      Logger.Log(LogLevel.DEBUG, "Checking the audio file for existence.");
+      if (!System.IO.File.Exists(config.AudioFile.Name))
+      {
+        Logger.Log(LogLevel.ERROR, $"Audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+        base.SendSystemPrivateMessage($"Important radio message audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+      }
+
       Logger.Log(LogLevel.DEBUG, $"ImportantRadioMessageAlertTask initialized.");
     }
 

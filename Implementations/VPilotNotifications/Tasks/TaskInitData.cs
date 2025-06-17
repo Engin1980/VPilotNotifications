@@ -9,5 +9,9 @@ using System.Threading.Tasks;
 
 namespace Eng.VPilotNotifications.Tasks
 {
-  internal record TaskInitData(ClientProxyBroker Broker, VatsimFlightPlanProvider VatsimFlightPlanProvider, ESimWrapper ESimWrapper);
+
+  internal record TaskInitData(
+    ClientProxyBroker Broker,
+    VatsimFlightPlanProvider VatsimFlightPlanProvider,
+    ESimWrapper ESimWrapper);
 }
