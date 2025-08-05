@@ -282,6 +282,15 @@
             <param name="onOpenedAction">Action to invoke when ESimConnect is opened.</param> -->
             <param name="mode">Mode of invoking action when ESimConnect is opened.</param>
         </member>
+        <member name="M:ESimConnect.Extenders.OpenInBackgroundExtender.AbortOpening(System.Boolean)">
+            <summary>
+            Aborts any ongoing background connection attempts to ESimConnect and optionally clears all queued actions.
+            </summary>
+            <param name="clearCurrentOpeningActions">
+            If <c>true</c> (default), clears all actions that were scheduled to be invoked upon a successful connection.
+            If <c>false</c>, preserves the queued actions for future connection attempts.
+            </param>
+        </member>
         <member name="T:ESimConnect.Extenders.SimTimeExtender">
             <summary>
             Provides event and states for Sim-Second-Elapsed and Paused.

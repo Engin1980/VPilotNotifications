@@ -114,6 +114,7 @@ namespace Eng.VPilotNotifications
       logger.Log(LogLevel.DEBUG, "Closing broker");
       broker.CloseBroker();
       logger.Log(LogLevel.DEBUG, "Closing ESimConnect");
+      eSimWrapper.Open.AbortOpening();
       eSimWrapper.ESimConnect.Close();
       logger.Log(LogLevel.INFO, "Main app loop ended. Exiting application.");
     }

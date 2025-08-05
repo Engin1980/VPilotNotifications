@@ -11,8 +11,8 @@
           "NAudio": "2.2.1",
           "Newtonsoft.Json": "13.0.3",
           "VPilotNetCoreModule": "1.0.0",
-          "ESimConnect": "1.7.0.0",
-          "ESystem": "1.8.3.9"
+          "ESimConnect": "1.11.0.0",
+          "ESystem": "1.12.0.0"
         },
         "runtime": {
           "VPilotNotifications.dll": {}
@@ -127,24 +127,24 @@
         },
         "runtime": {
           "VPilotNetCoreModule.dll": {
-            "assemblyVersion": "2.1.0.2",
-            "fileVersion": "1.1.0.1"
+            "assemblyVersion": "2.5.0.1",
+            "fileVersion": "1.5.0.1"
           }
         }
       },
-      "ESimConnect/1.7.0.0": {
+      "ESimConnect/1.11.0.0": {
         "runtime": {
           "ESimConnect.dll": {
-            "assemblyVersion": "1.7.0.0",
-            "fileVersion": "1.6.3.0"
+            "assemblyVersion": "1.11.0.0",
+            "fileVersion": "1.10.0.0"
           }
         }
       },
-      "ESystem/1.8.3.9": {
+      "ESystem/1.12.0.0": {
         "runtime": {
           "ESystem.dll": {
-            "assemblyVersion": "1.8.3.9",
-            "fileVersion": "1.8.3.9"
+            "assemblyVersion": "1.12.0.0",
+            "fileVersion": "1.12.0.0"
           }
         }
       },
@@ -253,12 +253,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "ESimConnect/1.7.0.0": {
+    "ESimConnect/1.11.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "ESystem/1.8.3.9": {
+    "ESystem/1.12.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
