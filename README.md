@@ -52,6 +52,10 @@ For any issue, feel free to raise a new issue at the [Issues](https://github.com
 
 # Version history
 
+**v2.1 - 2025-08-05**
+* BuFix: Incorrect shutdown behavior fixed
+* Private messages now cached and shown once connected to network.
+
 **v2.0 rev 1 - 2025-06-04**
 * BugFix: Incorrect behavior if VPilot started before FS is fully initialized.
 
