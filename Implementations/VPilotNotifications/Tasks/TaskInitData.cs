@@ -13,5 +13,6 @@ namespace Eng.VPilotNotifications.Tasks
   internal record TaskInitData(
     ClientProxyBroker Broker,
     VatsimFlightPlanProvider VatsimFlightPlanProvider,
+    VatsimAirplanePositionsProvider VatsimAirplanePositionsProvider,
     ESimWrapper ESimWrapper);
 }

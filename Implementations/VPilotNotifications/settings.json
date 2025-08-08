@@ -65,6 +65,15 @@
         "Volume": 1
       }
     },
+    "AirplanesOverlayDetector": {
+      "Enabled": true,
+      "ThresholdDistanceInMeters": 25,
+      "RepeatInterval" : 120,
+      "AudioFile": {
+        "Name": "Sounds\\airplanesOverlay.mp3",
+        "Volume": 1
+      }
+    },
     "ImportantRadioMessage": {
       "Enabled": true,
       "AudioFile": {

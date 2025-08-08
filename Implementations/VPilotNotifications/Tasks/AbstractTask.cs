@@ -17,6 +17,7 @@ namespace Eng.VPilotNotifications.Tasks
     protected ClientProxyBroker Broker { get; init; }
     protected Logger Logger { get; init; }
     protected VatsimFlightPlanProvider VatsimFlightPlanProvider { get; init; }
+    protected VatsimAirplanePositionsProvider VatsimAirplanePositionsProvider { get; init; }
     protected ESimWrapper ESimWrapper { get; init; }
     protected bool IsConnected { get; private set; } = false;
 
@@ -57,6 +58,7 @@ namespace Eng.VPilotNotifications.Tasks
 
       this.Broker = data.Broker;
       this.VatsimFlightPlanProvider = data.VatsimFlightPlanProvider;
+      this.VatsimAirplanePositionsProvider = data.VatsimAirplanePositionsProvider;
       this.ESimWrapper = data.ESimWrapper;
       this.Logger = Logger.Create(GetType().Name);
 

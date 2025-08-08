@@ -59,6 +59,16 @@ namespace Eng.VPilotNotifications.Settings
     public AudioFileConfig AudioFile { get; set; } = null!;
   }
 
+  public class AirplanesOverlayDetectorConfig
+  {
+    public bool Enabled { get; set; }
+    public int RepeatInterval { get; set; } 
+    public double ThresholdDistanceInMeters { get; set; } = 10.0;
+
+    [Required]
+    public AudioFileConfig AudioFile { get; set; } = null!;
+  }
+
   public class NoFlightPlanConfig
   {
     public bool Enabled { get; set; }

@@ -27,6 +27,7 @@ namespace Eng.VPilotNotifications
     private static ESimWrapper eSimWrapper = null!;
     private static readonly Logger logger = Logger.Create("VPilotNotifications.Main");
     private static VatsimFlightPlanProvider vatsimDataProvider = null!;
+    private static VatsimAirplanePositionsProvider vatsimAirplanePositionsProvider = null!;
     private static Config config = null!;
     private static readonly object LOG_FILE_LOCK = new();
     private static string? logFileName = null;
@@ -70,6 +71,11 @@ namespace Eng.VPilotNotifications
       logger.Log(LogLevel.INFO, "Initializing VATSIM flight plan provider ...");
       vatsimDataProvider = new VatsimFlightPlanProvider(broker, config.Vatsim);
       logger.Log(LogLevel.INFO, "Initializing VATSIM flight plan provider... - completed");
+
+      // init Vatsim Airplane Positions Provider
+      logger.Log(LogLevel.INFO, "Initializing VATSIM airplane positions provider ...");
+      vatsimAirplanePositionsProvider = new VatsimAirplanePositionsProvider(config.Vatsim);
+      logger.Log(LogLevel.INFO, "Initializing VATSIM airplane positions provider... - completed");
 
       // init tasks
       logger.Log(LogLevel.INFO, "Prepating task initialization...");
@@ -166,7 +172,7 @@ namespace Eng.VPilotNotifications
     private static void StartTasks()
     {
       AbstractTask at;
-      TaskInitData taskInitData = new(broker, vatsimDataProvider, eSimWrapper);
+      TaskInitData taskInitData = new(broker, vatsimDataProvider, vatsimAirplanePositionsProvider, eSimWrapper);
 
       if (config.Tasks.ContactMe.Enabled)
       {

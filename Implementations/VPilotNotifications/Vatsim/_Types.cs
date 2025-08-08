@@ -28,6 +28,7 @@ namespace Eng.VPilotNotifications.Vatsim
     public string Callsign { get; set; } = null!;
     public double Latitude { get; set; }
     public double Longitude { get; set; }
+    public double Altitude { get; set; }
     public FlightPlan Flight_plan { get; set; } = null!;
     public DateTime Last_updated { get; set; }
 
