@@ -1,23 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-		<UseWPF>true</UseWPF>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
-    <AssemblyVersion>2.5.0.1</AssemblyVersion>
-    <FileVersion>1.5.0.1</FileVersion>
+    <AssemblyVersion>2.6.0.0</AssemblyVersion>
+    <FileVersion>2.6.0.0</FileVersion>
+    <Version>2.6.0.0</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="ESimConnect">
-      <HintPath>..\..\_DLLs\_NET_CORE_6\ESimConnect.dll</HintPath>
+      <HintPath>..\..\_DLLs\_NET_CORE_8\ESimConnect.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.FlightSimulator.SimConnect">
-      <HintPath>..\..\_DLLs\_NET_CORE_6\Microsoft.FlightSimulator.SimConnect.dll</HintPath>
+      <HintPath>..\..\_DLLs\_NET_CORE_8\Microsoft.FlightSimulator.SimConnect.dll</HintPath>
     </Reference>
   </ItemGroup>
-
 </Project>
