@@ -51,4 +51,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="pushd &quot;$(SolutionDir)_BATs&quot;&#xD;&#xA;call copyBuildToVPilot.bat&#xD;&#xA;popd" />
+  </Target>
 </Project>
