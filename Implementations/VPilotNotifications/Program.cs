@@ -201,6 +201,13 @@ namespace Eng.VPilotNotifications
         at = new NoFlightPlanTask(taskInitData, config.Tasks.NoFlightPlan);
         tasks.Add(at);
       }
+
+      if (config.Tasks.AirplanesOverlayDetector.Enabled)
+      {
+        logger.Log(LogLevel.INFO, "Starting AirplanesOverlayDetector task...");
+        at = new AirplanesOverlayDetectorTask(taskInitData, config.Tasks.AirplanesOverlayDetector);
+        tasks.Add(at);
+    }
     }
 
     private static string ConfigAbsoluteFilePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, CONFIG_FILE_NAME);

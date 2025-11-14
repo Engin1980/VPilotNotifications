@@ -26,6 +26,7 @@ namespace Eng.VPilotNotifications.Tasks
     private readonly TypeId planeLatitudeTypeId;
     private readonly TypeId planeLongitudeTypeId;
     private readonly TypeId planeAltitudeTypeId;
+    private readonly TypeId simOnGroundTypeId;
     private readonly System.Timers.Timer? repeatTimer = null;
 
     internal AirplanesOverlayDetectorTask(TaskInitData data, AirplanesOverlayDetectorConfig config) : base(data)
@@ -59,9 +60,10 @@ namespace Eng.VPilotNotifications.Tasks
       }
 
       Logger.Log(LogLevel.DEBUG, "Registering TypeIds for AirplanesOverlayDetectorTask.");
-      this.planeLatitudeTypeId = this.ESimWrapper.ValueCache.Register("PLANE LATITUDE");
-      this.planeLongitudeTypeId = this.ESimWrapper.ValueCache.Register("PLANE LONGITUDE");
-      this.planeAltitudeTypeId = this.ESimWrapper.ValueCache.Register("PLANE ALTITUDE");
+      this.planeLatitudeTypeId = this.ESimWrapper.ValueCache.Register("PLANE LATITUDE", unit:ESimConnect.Definitions.SimUnits.Angle.DEGREE);
+      this.planeLongitudeTypeId = this.ESimWrapper.ValueCache.Register("PLANE LONGITUDE", unit: ESimConnect.Definitions.SimUnits.Angle.DEGREE);
+      this.planeAltitudeTypeId = this.ESimWrapper.ValueCache.Register("PLANE ALTITUDE", unit: ESimConnect.Definitions.SimUnits.Length.FOOT);
+      this.simOnGroundTypeId = this.ESimWrapper.ValueCache.Register("SIM ON GROUND");
 
 
       Logger.Log(LogLevel.DEBUG, "Checking the audio file for existence.");
@@ -76,6 +78,14 @@ namespace Eng.VPilotNotifications.Tasks
 
     private async Task DoOverlayDetectionAsync()
     {
+
+      double isOnGroundFlag = this.ESimWrapper.ValueCache.GetValue(simOnGroundTypeId);
+      if (isOnGroundFlag != 1)
+      {
+        Logger.Log(LogLevel.INFO, "Airplanes Overlay Detection after delay skipped, plane not on ground.");
+        return;
+      }
+
       int attempt = 0;
       const int MAX_ATTEMPTS = 5;
       Logger.Log(LogLevel.INFO, "Starting Airplanes Overlay Detection after initial delay.");
@@ -115,7 +125,7 @@ namespace Eng.VPilotNotifications.Tasks
         {
           Logger.Log(LogLevel.INFO, $"Detected airplane overlay: CID={overlay.Cid}, Callsign={overlay.Callsign}, " +
             $"Lat={overlay.Latitude}, Lon={overlay.Longitude}, Alt={overlay.Altitude}, Dist={overlay.DistanceInMeters}m");
-          base.SendSystemPrivateMessage($"Detected airplane overlay: CID={overlay.Cid}, Callsign={overlay.Callsign}, distance={overlay.DistanceInMeters:0N} m");
+          base.SendSystemPrivateMessage($"Detected airplane overlay: CID={overlay.Cid}, Callsign={overlay.Callsign}, distance={overlay.DistanceInMeters:N0} m");
         }
       }
     }

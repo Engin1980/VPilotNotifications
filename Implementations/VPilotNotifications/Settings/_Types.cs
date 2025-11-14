@@ -17,7 +17,7 @@ namespace Eng.VPilotNotifications.Settings
     public TasksConfig Tasks { get; set; } = null!;
 
     [Required]
-    public VatsimConfig Vatsim { get; set; } = null!;
+    public VatsimConfig Vatsim { get; set; } = null!;      
 
     [Required]
     public GlobalConfig Global { get; set; } = null!;
@@ -42,6 +42,8 @@ namespace Eng.VPilotNotifications.Settings
 
     [Required]
     public DisconnectedConfig Disconnected { get; set; } = null!;
+    [Required]
+    public AirplanesOverlayDetectorConfig AirplanesOverlayDetector { get; set; } = null!;
   }
 
   public class ContactMeConfig
@@ -125,6 +127,7 @@ namespace Eng.VPilotNotifications.Settings
     public int RefreshFlightPlanUpdateInterval { get; set; }
   }
 
+  
   public class GlobalConfig
   {
     public bool SendPrivateMessageWhenConnectedForTheFirstTime { get; set; }
