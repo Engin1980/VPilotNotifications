@@ -23,6 +23,7 @@ namespace Eng.VPilotNetCoreBridge
     private readonly Logger logger = new Logger();
     private IBroker broker;
     private ServerProxy serverProxy;
+    private static string pipeId = "VPilotNetCoreBridgePipe" + new Random().Next(100_000,999_999);
 
     public string Name => "VPilotNetCoreBridge";
 
@@ -42,7 +43,7 @@ namespace Eng.VPilotNetCoreBridge
         return;
       }
 
-      logger.Log(Logger.LogLevel.Info, "Starting client...");
+      logger.Log(Logger.LogLevel.Info, $"Starting client with pipeId={pipeId}...");
       if (StartClient(config) == Result.Error)
       {
         logger.Log(Logger.LogLevel.Error, "Failed to load client. Plugin will not start.");
@@ -53,7 +54,7 @@ namespace Eng.VPilotNetCoreBridge
 
       logger.Log(Logger.LogLevel.Info, "Building Server Proxy.");
       this.serverProxy = new ServerProxy(
-        config.PipeId, 
+        pipeId,
         config.ProcessAircraftRelatedEvents, 
         config.ConnectTimeout,
         broker);
@@ -76,7 +77,7 @@ namespace Eng.VPilotNetCoreBridge
       ProcessStartInfo psi = new ProcessStartInfo()
       {
         FileName = config.ClientExe,
-        Arguments = $"{config.PipeId}"
+        Arguments = pipeId
       };
 
       if (config.ShowClientConsole == false)
@@ -132,12 +133,6 @@ namespace Eng.VPilotNetCoreBridge
       if (System.IO.File.Exists(ret.ClientExe) == false)
       {
         logger.Log(Logger.LogLevel.Error, $"Client executable {ret.ClientExe} ({System.IO.Path.GetFullPath(ret.ClientExe)}) not found.");
-        config = null;
-        return Result.Error;
-      }
-      if (ret.PipeId.Length == 0)
-      {
-        logger.Log(Logger.LogLevel.Error, $"Pipe ID {ret.PipeId} is empty.");
         config = null;
         return Result.Error;
       }

@@ -9,7 +9,6 @@ namespace Eng.VPilotNetCoreBridge
   public class Config
   {
     public string ClientExe { get; set; }
-    public string PipeId { get; set; }
     public bool ShowClientConsole { get; set; }
     public int ConnectTimeout { get; set; } = 5000; // Default to 5 seconds
     public bool ProcessAircraftRelatedEvents { get; set; }

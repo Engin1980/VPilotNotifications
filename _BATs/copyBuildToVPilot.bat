@@ -1,11 +1,22 @@
-copy VPilotNetCoreBridge\bin\Debug\*.*  C:\Users\marek\AppData\Local\vPilot\Plugins
-rem copy PlugintTestToDelete\bin\Debug\*.*  C:\Users\marek\AppData\Local\vPilot\Plugins
+@ECHO OFF
 
-mkdir C:\Users\marek\AppData\Local\vPilot\Plugins\VPilotNetCoreModuleTest
-copy VPilotNetCoreModuleTest\bin\Debug\net6.0\*.* C:\Users\marek\AppData\Local\vPilot\Plugins\VPilotNetCoreModuleTest\
+SET "PLUGINS=%USERPROFILE%\AppData\Local\vPilot\Plugins"
+ECHO VPilot-Plugin path detected as '%PLUGINS%'
 
-del C:\Users\marek\AppData\Local\vPilot\Plugins\RossCarlson.Vatsim.Vpilot.Plugins.dll
-del C:\Users\marek\AppData\Local\vPilot\Plugins\RossCarlson.Vatsim.Vpilot.Plugins.xml
-del C:\Users\marek\AppData\Local\vPilot\Plugins\VPilotnetCoreBridge.config.json
-move C:\Users\marek\AppData\Local\vPilot\Plugins\VPilotnetCoreBridge.config-vpilot.json C:\Users\marek\AppData\Local\vPilot\Plugins\VPilotnetCoreBridge.config.json
+ECHO Copy base
+
+COPY ..\Base\VPilotNetCoreBridge\bin\Debug\*  %PLUGINS%
+
+ECHO Copy Client
+MKDIR %PLUGINS%\VPilotNotifications
+COPY ..\Implementations\VPilotNotifications\bin\Debug\net8.0-windows7.0\* %PLUGINS%\VPilotNotifications\
+
+MKDIR %HOMEPATH%\AppData\Local\vPilot\Plugins\VPilotNotifications\Sounds
+COPY ..\Implementations\VPilotNotifications\bin\Debug\net8.0-windows7.0\Sounds\*.* %PLUGINS%\VPilotNotifications\Sounds\
+COPY ..\_DLLs\_NET_CORE_8\SimConnect.dll %PLUGINS%\VPilotNotifications\
+
+DEL %PLUGINS%\RossCarlson.Vatsim.Vpilot.Plugins.dll
+DEL %PLUGINS%\RossCarlson.Vatsim.Vpilot.Plugins.xml
+DEL %PLUGINS%\VPilotnetCoreBridge.config.json
+MOVE %PLUGINS%\VPilotnetCoreBridge.config-vpilot.json %PLUGINS%\VPilotnetCoreBridge.config.json
 

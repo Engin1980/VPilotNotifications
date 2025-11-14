@@ -1,16 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-		<UseWPF>true</UseWPF>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>2.5.0.3</AssemblyVersion>
-    <FileVersion>2.5.0.3</FileVersion>
+    <AssemblyVersion>2.6.0.0</AssemblyVersion>
+    <FileVersion>2.6.0.0</FileVersion>
     <PlatformTarget>x64</PlatformTarget>
+    <Version>2.6.0.0</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="Sounds\connected.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -22,25 +22,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Base\VPilotNetCoreModule\VPilotNetCoreModule.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="ESimConnect">
-      <HintPath>..\..\_DLLs\_NET_CORE_6\ESimConnect.dll</HintPath>
+      <HintPath>..\..\_DLLs\_NET_CORE_8\ESimConnect.dll</HintPath>
     </Reference>
     <Reference Include="ESystem">
-      <HintPath>..\..\_DLLs\_NET_CORE_6\ESystem.dll</HintPath>
+      <HintPath>..\..\_DLLs\_NET_CORE_8\ESystem.dll</HintPath>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -55,5 +51,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="pushd &quot;$(SolutionDir)_BATs&quot;&#xD;&#xA;call copyBuildToVPilot.bat&#xD;&#xA;popd" />
+  </Target>
 </Project>

@@ -1,23 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>2.5.0.2</AssemblyVersion>
-    <FileVersion>1.5.0.2</FileVersion>
+    <AssemblyVersion>2.6.0.0</AssemblyVersion>
+    <FileVersion>2.6.0.0</FileVersion>
     <PlatformTarget>x64</PlatformTarget>
+    <Version>2.6.0.0</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Base\VPilotNetCoreModule\VPilotNetCoreModule.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="ESystem">
-      <HintPath>..\..\_DLLs\_NET_CORE_6\ESystem.dll</HintPath>
+      <HintPath>..\..\_DLLs\_NET_CORE_8\ESystem.dll</HintPath>
     </Reference>
   </ItemGroup>
-
 </Project>

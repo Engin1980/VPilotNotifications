@@ -19,18 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NET_472", "_NET_472", "{CB
 		_DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.xml = _DLLs\_NET_472\RossCarlson.Vatsim.Vpilot.Plugins.xml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NET_CORE_6", "_NET_CORE_6", "{A56ADE86-D3E1-4680-9762-D62233247FE5}"
-	ProjectSection(SolutionItems) = preProject
-		_DLLs\_NET_CORE_6\ESimConnect.deps.json = _DLLs\_NET_CORE_6\ESimConnect.deps.json
-		_DLLs\_NET_CORE_6\ESimConnect.dll = _DLLs\_NET_CORE_6\ESimConnect.dll
-		_DLLs\_NET_CORE_6\ESimConnect.pdb = _DLLs\_NET_CORE_6\ESimConnect.pdb
-		_DLLs\_NET_CORE_6\ESimConnect.xml = _DLLs\_NET_CORE_6\ESimConnect.xml
-		_DLLs\_NET_CORE_6\ESystem.dll = _DLLs\_NET_CORE_6\ESystem.dll
-		_DLLs\_NET_CORE_6\ESystem.pdb = _DLLs\_NET_CORE_6\ESystem.pdb
-		_DLLs\_NET_CORE_6\Microsoft.FlightSimulator.SimConnect.dll = _DLLs\_NET_CORE_6\Microsoft.FlightSimulator.SimConnect.dll
-		_DLLs\_NET_CORE_6\SimConnect.dll = _DLLs\_NET_CORE_6\SimConnect.dll
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPilotNotifications", "Implementations\VPilotNotifications\VPilotNotifications.csproj", "{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementations", "Implementations", "{3F5F92D7-E66C-4FC6-B048-34F81F4B187C}"
@@ -41,7 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{EB3C4DF2-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_BATs", "_BATs", "{21229B10-5E09-4207-BCAB-BC827B3A8162}"
 	ProjectSection(SolutionItems) = preProject
-		_BATs\copyBuildToVPilot-nb.bat = _BATs\copyBuildToVPilot-nb.bat
 		_BATs\copyBuildToVPilot.bat = _BATs\copyBuildToVPilot.bat
 		_BATs\createRelease.bat = _BATs\createRelease.bat
 	EndProjectSection
@@ -49,6 +36,25 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESimConectTest", "Tests\ESimConectTest\ESimConectTest.csproj", "{4DCAC591-E5C1-4731-911E-3A3C701E5859}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAudioSimpleTest", "Tests\NAudioSimpleTest\NAudioSimpleTest.csproj", "{5FB3DC5B-02F0-4919-84FA-8E8610DAC20A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NET_CORE_8", "_NET_CORE_8", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		_DLLs\_NET_CORE_8\ESimConnect.deps.json = _DLLs\_NET_CORE_8\ESimConnect.deps.json
+		_DLLs\_NET_CORE_8\ESimConnect.dll = _DLLs\_NET_CORE_8\ESimConnect.dll
+		_DLLs\_NET_CORE_8\ESimConnect.pdb = _DLLs\_NET_CORE_8\ESimConnect.pdb
+		_DLLs\_NET_CORE_8\ESimConnect.xml = _DLLs\_NET_CORE_8\ESimConnect.xml
+		_DLLs\_NET_CORE_8\ESystem.dll = _DLLs\_NET_CORE_8\ESystem.dll
+		_DLLs\_NET_CORE_8\ESystem.pdb = _DLLs\_NET_CORE_8\ESystem.pdb
+		_DLLs\_NET_CORE_8\Microsoft.FlightSimulator.SimConnect.dll = _DLLs\_NET_CORE_8\Microsoft.FlightSimulator.SimConnect.dll
+		_DLLs\_NET_CORE_8\SimConnect.dll = _DLLs\_NET_CORE_8\SimConnect.dll
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,10 +100,10 @@ Global
 		{4D99CFD1-52B6-4E39-B833-865FD3A6D557} = {30D5D51D-406C-4C1F-8E64-9EC104ADE0D8}
 		{033A8668-658E-422F-95B3-0BBD5E1C02C7} = {30D5D51D-406C-4C1F-8E64-9EC104ADE0D8}
 		{CBBF0A20-7CB8-49B3-9C9C-B32988229762} = {B876EA93-8C48-4620-9875-D8FADCDC6ED5}
-		{A56ADE86-D3E1-4680-9762-D62233247FE5} = {B876EA93-8C48-4620-9875-D8FADCDC6ED5}
 		{4D06F4AC-67C1-4480-9C0E-78CACDA5F77B} = {3F5F92D7-E66C-4FC6-B048-34F81F4B187C}
 		{4DCAC591-E5C1-4731-911E-3A3C701E5859} = {30D5D51D-406C-4C1F-8E64-9EC104ADE0D8}
 		{5FB3DC5B-02F0-4919-84FA-8E8610DAC20A} = {30D5D51D-406C-4C1F-8E64-9EC104ADE0D8}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {B876EA93-8C48-4620-9875-D8FADCDC6ED5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CAF5BAED-985B-4573-B08C-B2D3F3AA879C}
