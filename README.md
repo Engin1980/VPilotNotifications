@@ -4,7 +4,8 @@ A simple tool adding sound **notifications** to [VPilot](https://vpilot.rosscarl
 * 🔊 when **your callsign, departure or destination airport is mentioned in radio communication**;
 * 🔊 when **contact me ...** message was received but frequency were not tuned;
 * 🔊 while **disconnected**;
-* 🔊 when **departing without filled VATSIM FlightPlan**.
+* 🔊 when **departing without filled VATSIM FlightPlan**,
+* 🔊 when you connects to the **occupied gate/stand** (or vice-versa).
 
 **Why** Cos I made an airprox with KLM1277 at EGPH, moreover accusing him of not using UNICOM. I overlooked the message in the mess of others chatting. My big apologies.
 
@@ -26,8 +27,21 @@ The tool is based on .NET Framework 4.7.2 (which is used by VPilot by default, s
 
 ... files, where `...\VPilot` represents VPilot installation folder.
 
-# ✓ Validating installation
-Ensure you are using the default `settings.json` file.
+So, the example layout looks like:
+```
+C:\Users\user\AppData\Local\vPilot
+    vPilot.exe
+    ...
+    Plugins
+        VPilotNetCoreBridge.dll
+        ...
+        VPilotNotifications
+            VPilotNotifications.exe
+            ...
+```
+
+# ✓ Validating installation & Starting the app
+**The vPilot plugins starts automatically once vPilot is started.** You are not supposed to run any .exe file from the plugin folders.
 
 1. Start the Flight Simulator and the flight.
 2. Start VPilot.
@@ -51,6 +65,9 @@ Once added to the `Plugins` folder, there is no additional set-up. Just start VP
 For any issue, feel free to raise a new issue at the [Issues](https://github.com/Engin1980/VPilotNotifications/issues) tab. Please add the relevant content of the `log` files if relevant.
 
 # Version history
+
+**v2.3 - 2025-11-15**
+* Added ground colision detection with other player (used to notify that you connected to busy gate, or somebody newly connects to your gate)
 
 **v2.2 - 2025-11-14**
 * Migrated to .NET 8
