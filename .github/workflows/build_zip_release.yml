@@ -28,20 +28,17 @@ jobs:
       - name: Show module short version
         run: echo "Short Version = ${{ steps.module_version.outputs.short_version }}"        
 
-      # building plugin
-      - name: Restore .NET 4.7.2 project
+      # restore all projects in solution (supports packages.config and PackageReference)
+      - name: Restore solution (MSBuild)
         run: |
-          nuget restore Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj -SolutionDirectory .
+          msbuild VPilotNotificationsSolution.sln /t:Restore /p:RestorePackagesConfig=true
 
+      # build .NET Framework project(s)
       - name: Build .NET 4.7.2 project
         run: |
           msbuild Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release
 
       # building module(s)
-      - name: Restore .NET 8 projects
-        run: |
-          dotnet restore Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj
-          dotnet restore Implementations/VPilotNotifications/VPilotNotifications.csproj      
 
       - name: Build and publish
         run: |
