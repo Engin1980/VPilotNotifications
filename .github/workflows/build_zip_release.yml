@@ -75,7 +75,7 @@ jobs:
         id: get_module_version
         uses: KageKirin/get-csproj-version@v0
         with:
-          file: Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
+          file: Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj
           xpath: //PropertyGroup/Version
           regex: ^(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(\.[0-9]+)?$
 
