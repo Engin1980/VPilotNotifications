@@ -36,14 +36,14 @@ jobs:
       # build .NET Framework project(s)
       - name: Build .NET 4.7.2 project
         run: |
-          msbuild Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release
+          msbuild Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release /p:RunPostBuildEvent=Never
 
       # building module(s)
 
       - name: Build and publish
         run: |
           # dotnet publish Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj -c Release -o out        
-          dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out
+          dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out /p:RunPostBuildEvent=Never
 
       - name: List all files
         run: |
