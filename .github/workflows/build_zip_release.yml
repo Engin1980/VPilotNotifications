@@ -3,7 +3,7 @@ name: Release build and deploy
 on:
   push:
     branches:
-      - master
+      - release
 
 permissions:
   contents: write  # nutné pro release a GitHub Pages deploy
