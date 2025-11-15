@@ -61,11 +61,7 @@ jobs:
           $csproj = 'Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj'
           [xml]$xml = Get-Content $csproj
           $version = ($xml.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ } | Select-Object -First 1)
-          if (-not $version) {
-            Write-Error "Version not found in $csproj"
-            exit 1
-          }
-          $shortVersion = ($version -split '\\.')[[0..2]] -join '.'
+          $shortVersion = ($version -split '\\.')[0..2] -join '.'
           echo "version=$version" >> $env:GITHUB_OUTPUT
           echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
           echo "Module full version: $version"
