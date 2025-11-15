@@ -25,43 +25,6 @@ jobs:
       - name: Setup MSBuild for .NET Framework
         uses: microsoft/setup-msbuild@v2
 
-      # plugin version
-      - name: Get version from plugin csproj
-        id: get_plugin_version
-        uses: KageKirin/get-csproj-version@v0
-        with:
-          file: Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
-          xpath: //PropertyGroup/Version
-          regex: ^(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(\.[0-9]+)?$
-
-      - name: Normalize plugin version
-        id: plugin_version
-        run: |
-          $fullVersion = "${{ steps.get_plugin_version.outputs.version }}"
-          $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
-          echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
-        shell: pwsh
-
-      - name: Show plugin short version
-        run: echo "Short Version = ${{ steps.plugin_version.outputs.short_version }}"
-
-      # module version
-      - name: Get version from module csproj
-        id: get_module_version
-        uses: KageKirin/get-csproj-version@v0
-        with:
-          file: Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
-          xpath: //PropertyGroup/Version
-          regex: ^(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(\.[0-9]+)?$
-
-      - name: Normalize module version
-        id: module_version
-        run: |
-          $fullVersion = "${{ steps.get_module_version.outputs.version }}"
-          $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
-          echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
-        shell: pwsh
-
       - name: Show module short version
         run: echo "Short Version = ${{ steps.module_version.outputs.short_version }}"        
 
@@ -84,4 +47,50 @@ jobs:
         run: |
           # dotnet publish Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj -c Release -o out        
           dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out
+
+      - name: List all files
+        run: |
+          Get-ChildItem -Path . -Recurse
+
+
+      # plugin version
+      - name: Get plugin assembly version
+        run: |
+          $file = Get-Item "./Project1/bin/Release/YourApp.exe"
+          $version = $file.VersionInfo.FileVersion
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+        shell: pwsh
+
+      - name: Normalize plugin version
+        id: plugin_version
+        run: |
+          $fullVersion = "${{ steps.get_plugin_version.outputs.version }}"
+          $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
+          echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Show plugin short version
+        run: echo "Short Version = ${{ steps.plugin_version.outputs.short_version }}"
+
+
+      # module version
+      - name: Get version from module csproj
+        id: get_module_version
+        uses: KageKirin/get-csproj-version@v0
+        with:
+          file: Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
+          xpath: //PropertyGroup/Version
+          regex: ^(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(\.[0-9]+)?$
+
+      - name: Normalize module version
+        id: module_version
+        run: |
+          $fullVersion = "${{ steps.get_module_version.outputs.version }}"
+          $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
+          echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+
+
+
 
