@@ -1,0 +1,87 @@
+name: Release build and deploy
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write  # nutné pro release a GitHub Pages deploy
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      
+      - name: Setup MSBuild for .NET Framework
+        uses: microsoft/setup-msbuild@v2
+
+      # plugin version
+      - name: Get version from plugin csproj
+        id: get_plugin_version
+        uses: KageKirin/get-csproj-version@v0
+        with:
+          file: Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
+          xpath: //PropertyGroup/Version
+          regex: ^(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(\.[0-9]+)?$
+
+      - name: Normalize plugin version
+        id: plugin_version
+        run: |
+          $fullVersion = "${{ steps.get_plugin_version.outputs.version }}"
+          $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
+          echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Show plugin short version
+        run: echo "Short Version = ${{ steps.plugin_version.outputs.short_version }}"
+
+      # module version
+      - name: Get version from module csproj
+        id: get_module_version
+        uses: KageKirin/get-csproj-version@v0
+        with:
+          file: Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
+          xpath: //PropertyGroup/Version
+          regex: ^(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(\.[0-9]+)?$
+
+      - name: Normalize module version
+        id: module_version
+        run: |
+          $fullVersion = "${{ steps.get_module_version.outputs.version }}"
+          $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
+          echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Show module short version
+        run: echo "Short Version = ${{ steps.module_version.outputs.short_version }}"        
+
+      # building plugin
+      - name: Restore .NET 4.7.2 project
+        run: |
+          nuget restore ./VPilotNotifications/Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
+
+      - name: Build .NET 4.7.2 project
+        run: |
+          msbuild VPilotNotifications/Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release
+
+      # building module(s)
+      - name: Restore .NET 8 projects
+        run: |
+          dotnet restore Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj
+          dotnet restore Implementations/VPilotNotifications/VPilotNotifications.csproj      
+
+      - name: Build and publish
+        run: |
+          # dotnet publish Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj -c Release -o out        
+          dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out
+
