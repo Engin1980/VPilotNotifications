@@ -96,6 +96,11 @@ jobs:
           Remove-Item -Path "out/plugin/RossCarlson.Vatsim.Vpilot.Plugins.xml" -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Path "out/plugin/VPilotNotifications" -Force
           Copy-Item -Path "out/module/*" -Destination "out/plugin/VPilotNotifications/" -Recurse -Force
+          # Copy root docs to output
+          Copy-Item -Path "./README.md" -Destination "out/plugin/README.md" -Force
+          Copy-Item -Path "./LICENSE" -Destination "out/plugin/LICENSE" -Force
+          Remove-Item -Path "out/plugin/VPilotnetCoreBridge.config.json" -Force
+          Move-Item -Path "out/plugin/VPilotnetCoreBridge.config-vpilot.json" -Destination "out/plugin/VPilotnetCoreBridge.config.json" -Force
         shell: pwsh
 
       - name: Create release ZIP
