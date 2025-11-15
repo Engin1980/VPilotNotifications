@@ -36,17 +36,17 @@ jobs:
       # build .NET Framework project(s)
       - name: Build .NET 4.7.2 project
         run: |
-          msbuild Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release
+          msbuild Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release /p:OutputPath=..\..\out\plugin\
 
       # building module(s)
 
       - name: Build and publish
         run: |
-          dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out
+          dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out/module
 
       - name: List all files
         run: |
-          Get-ChildItem -Path . -Recurse
+          Get-ChildItem -Path .\out -Recurse
 
 
       # plugin version
