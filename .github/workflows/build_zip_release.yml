@@ -51,8 +51,9 @@ jobs:
 
       # plugin version
       - name: Get plugin assembly version
+        id: get_plugin_version
         run: |
-          $file = Get-Item "./Project1/bin/Release/YourApp.exe"
+          $file = Get-Item "./out/plugin/VPilotNetCoreBridge.dll"
           $version = $file.VersionInfo.FileVersion
           echo "VERSION=$version" >> $env:GITHUB_ENV
         shell: pwsh
@@ -86,7 +87,13 @@ jobs:
           echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
-
+      - name: Prepare plugin structure
+        run: |
+          Remove-Item -Path "out/plugin/RossCarlson.Vatsim.Vpilot.Plugins.dll" -ErrorAction SilentlyContinue
+          Remove-Item -Path "out/plugin/RossCarlson.Vatsim.Vpilot.Plugins.xml" -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path "out/plugin/VPilotNotifications" -Force
+          Copy-Item -Path "out/module/*" -Destination "out/plugin/VPilotNotifications/" -Recurse -Force
+        shell: pwsh
 
 
 
