@@ -31,11 +31,11 @@ jobs:
       # building plugin
       - name: Restore .NET 4.7.2 project
         run: |
-          nuget restore ./VPilotNotifications/Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
+          nuget restore Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
 
       - name: Build .NET 4.7.2 project
         run: |
-          msbuild VPilotNotifications/Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release
+          msbuild Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release
 
       # building module(s)
       - name: Restore .NET 8 projects
