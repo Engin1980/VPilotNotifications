@@ -95,5 +95,12 @@ jobs:
           Copy-Item -Path "out/module/*" -Destination "out/plugin/VPilotNotifications/" -Recurse -Force
         shell: pwsh
 
+      - name: Create release ZIP
+        run: |
+          $zipName = "plug-v${{ steps.plugin_version.outputs.short_version }}-mod-v${{ steps.module_version.outputs.short_version }}.zip"
+          Compress-Archive -Path "out/plugin/*" -DestinationPath $zipName -Force
+          echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
+        shell: pwsh
+
 
 
