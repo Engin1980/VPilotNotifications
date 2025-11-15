@@ -41,44 +41,35 @@ jobs:
           dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out/module
 
       # plugin version
-      - name: Get plugin assembly version
-        id: get_plugin_version
+      - name: Get and normalize plugin version
+        id: plugin_version
         run: |
           $file = Get-Item "./out/plugin/VPilotNetCoreBridge.dll"
           $version = $file.VersionInfo.FileVersion
+          $shortVersion = ($version -split '\\.')[0..2] -join '.'
           echo "VERSION=$version" >> $env:GITHUB_ENV
           echo "version=$version" >> $env:GITHUB_OUTPUT
-        shell: pwsh
-
-      - name: Normalize plugin version
-        id: plugin_version
-        run: |
-          $fullVersion = "${{ steps.get_plugin_version.outputs.version }}"
-          $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
           echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
-          echo "Plugin full version: $fullVersion"
+          echo "Plugin full version: $version"
           echo "Plugin short version: $shortVersion"
         shell: pwsh
 
-      - name: Show plugin short version
-        run: echo "Short Version = ${{ steps.plugin_version.outputs.short_version }}"
-
-
-      # module version
-      - name: Get version from module csproj
-        id: get_module_version
-        uses: KageKirin/get-csproj-version@v0
-        with:
-          file: Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj
-          xpath: //PropertyGroup/Version
-          regex: ^(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(\.[0-9]+)?$
-
-      - name: Normalize module version
+      # module version (read and normalize in one step)
+      - name: Get and normalize module version
         id: module_version
         run: |
-          $fullVersion = "${{ steps.get_module_version.outputs.version }}"
-          $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
+          $csproj = 'Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj'
+          [xml]$xml = Get-Content $csproj
+          $version = ($xml.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ } | Select-Object -First 1)
+          if (-not $version) {
+            Write-Error "Version not found in $csproj"
+            exit 1
+          }
+          $shortVersion = ($version -split '\\.')[[0..2]] -join '.'
+          echo "version=$version" >> $env:GITHUB_OUTPUT
           echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
+          echo "Module full version: $version"
+          echo "Module short version: $shortVersion"
         shell: pwsh
 
       - name: Prepare plugin structure
