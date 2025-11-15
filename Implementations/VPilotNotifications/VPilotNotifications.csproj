@@ -54,7 +54,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(GITHUB_ACTIONS)' != 'true'">
     <Exec Command="pushd &quot;$(SolutionDir)_BATs&quot;&#xD;&#xA;call copyBuildToVPilot.bat&#xD;&#xA;popd" />
   </Target>
 </Project>
