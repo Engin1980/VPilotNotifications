@@ -1,0 +1,104 @@
+name: Release build and deploy
+
+on:
+  push:
+    branches:
+      - release
+
+permissions:
+  contents: write  # nutné pro release a GitHub Pages deploy
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup MSBuild for .NET Framework
+        uses: microsoft/setup-msbuild@v2      
+
+      # restore all projects in solution (supports packages.config and PackageReference)
+      - name: Restore solution (MSBuild)
+        run: |
+          msbuild VPilotNotificationsSolution.sln /t:Restore /p:RestorePackagesConfig=true
+
+      # build .NET Framework project(s)
+      - name: Build .NET 4.7.2 project
+        run: |
+          msbuild Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj /p:Configuration=Release /p:OutputPath=..\..\out\plugin\
+
+      # building module(s)
+
+      - name: Build and publish
+        run: |
+          dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out/module
+
+      # plugin version
+      - name: Get and normalize plugin version
+        id: plugin_version
+        run: |
+          $file = Get-Item "./out/plugin/VPilotNetCoreBridge.dll"
+          $version = $file.VersionInfo.FileVersion
+          $shortVersion = ($version -split '\\.')[0..2] -join '.'
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
+          echo "Plugin full version: $version"
+          echo "Plugin short version: $shortVersion"
+        shell: pwsh
+
+      # module version (read and normalize in one step)
+      - name: Get and normalize module version
+        id: module_version
+        run: |
+          $csproj = 'Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj'
+          [xml]$xml = Get-Content $csproj
+          $version = ($xml.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ } | Select-Object -First 1)
+          $shortVersion = ($version -split '\\.')[0..2] -join '.'
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
+          echo "Module full version: $version"
+          echo "Module short version: $shortVersion"
+        shell: pwsh
+
+      - name: Prepare plugin structure
+        run: |
+          Remove-Item -Path "out/plugin/RossCarlson.Vatsim.Vpilot.Plugins.dll" -ErrorAction SilentlyContinue
+          Remove-Item -Path "out/plugin/RossCarlson.Vatsim.Vpilot.Plugins.xml" -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path "out/plugin/VPilotNotifications" -Force
+          Copy-Item -Path "out/module/*" -Destination "out/plugin/VPilotNotifications/" -Recurse -Force
+          # Copy root docs to output
+          Copy-Item -Path "./README.md" -Destination "out/plugin/README.md" -Force
+          Copy-Item -Path "./LICENSE" -Destination "out/plugin/LICENSE" -Force
+          Remove-Item -Path "out/plugin/VPilotnetCoreBridge.config.json" -Force
+          Move-Item -Path "out/plugin/VPilotnetCoreBridge.config-vpilot.json" -Destination "out/plugin/VPilotnetCoreBridge.config.json" -Force
+          Copy-Item -Path "./_DLLs/_NET_CORE_8/SimConnect.dll" -Destination "out/plugin/VPilotNotifications/"
+        shell: pwsh
+
+      - name: Create release ZIP
+        run: |
+          $zipName = "VPilotNotifications--plug-v${{ steps.plugin_version.outputs.short_version }}-mod-v${{ steps.module_version.outputs.short_version }}.zip"
+          Compress-Archive -Path "out/plugin/*" -DestinationPath $zipName -Force
+          echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
+        shell: pwsh
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.ZIP_NAME }}
+          name: ${{ env.ZIP_NAME }}
+          files: ${{ env.ZIP_NAME }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
