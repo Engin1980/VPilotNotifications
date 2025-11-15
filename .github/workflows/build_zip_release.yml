@@ -42,7 +42,6 @@ jobs:
 
       - name: Build and publish
         run: |
-          # dotnet publish Base/VPilotNetCoreModule/VPilotNetCoreModule.csproj -c Release -o out        
           dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out /p:RunPostBuildEvent=Never
 
       - name: List all files
