@@ -21,12 +21,8 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      
       - name: Setup MSBuild for .NET Framework
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Show module short version
-        run: echo "Short Version = ${{ steps.module_version.outputs.short_version }}"        
+        uses: microsoft/setup-msbuild@v2      
 
       # restore all projects in solution (supports packages.config and PackageReference)
       - name: Restore solution (MSBuild)
@@ -43,11 +39,6 @@ jobs:
       - name: Build and publish
         run: |
           dotnet publish Implementations/VPilotNotifications/VPilotNotifications.csproj -c Release -o out/module
-
-      - name: List all files
-        run: |
-          Get-ChildItem -Path .\out -Recurse
-
 
       # plugin version
       - name: Get plugin assembly version
