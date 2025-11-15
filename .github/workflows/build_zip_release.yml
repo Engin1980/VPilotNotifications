@@ -31,7 +31,7 @@ jobs:
       # building plugin
       - name: Restore .NET 4.7.2 project
         run: |
-          nuget restore Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj
+          nuget restore Base/VPilotNetCoreBridge/VPilotNetCoreBridge.csproj -SolutionDirectory .
 
       - name: Build .NET 4.7.2 project
         run: |
