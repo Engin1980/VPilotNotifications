@@ -11,10 +11,10 @@ mkdir ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications
 
 echo Copying .NET FW 4.7.2 plugin files
 xcopy /e ..\Base\VPilotNetCoreBridge\bin\debug\ ..\_Release\VPilotNotificationsPlugin\Plugins\
-xcopy ..\_DLLs\_NET_CORE_6\SimConnect.dll ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications\
+xcopy ..\_DLLs\_NET_CORE_8\SimConnect.dll ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications\
 
-echo Copying .NET 6 plugin files
-xcopy /e ..\Implementations\VPilotNotifications\bin\Debug\net6.0-windows\ ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications\
+echo Copying .NET 8 plugin files
+xcopy /e ..\Implementations\VPilotNotifications\bin\Debug\net8.0-windows7.0\ ..\_Release\VPilotNotificationsPlugin\Plugins\VPilotNotifications\
 
 echo Removing prohibited .DLLs
 del ..\_Release\VPilotNotificationsPlugin\Plugins\RossCarlson.Vatsim.Vpilot.Plugins.dll
