@@ -101,6 +101,7 @@ jobs:
           Copy-Item -Path "./LICENSE" -Destination "out/plugin/LICENSE" -Force
           Remove-Item -Path "out/plugin/VPilotnetCoreBridge.config.json" -Force
           Move-Item -Path "out/plugin/VPilotnetCoreBridge.config-vpilot.json" -Destination "out/plugin/VPilotnetCoreBridge.config.json" -Force
+          Copy-Item -Path "./_DLLs/_NET_CORE_8/ESimConnect.dll" -Destination "out/plugin/VPilotNotifications/"
         shell: pwsh
 
       - name: Create release ZIP
