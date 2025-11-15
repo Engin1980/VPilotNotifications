@@ -56,6 +56,7 @@ jobs:
           $file = Get-Item "./out/plugin/VPilotNetCoreBridge.dll"
           $version = $file.VersionInfo.FileVersion
           echo "VERSION=$version" >> $env:GITHUB_ENV
+          echo "version=$version" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
       - name: Normalize plugin version
@@ -64,6 +65,8 @@ jobs:
           $fullVersion = "${{ steps.get_plugin_version.outputs.version }}"
           $shortVersion = ($fullVersion -split '\.')[0..2] -join '.'
           echo "short_version=$shortVersion" >> $env:GITHUB_OUTPUT
+          echo "Plugin full version: $fullVersion"
+          echo "Plugin short version: $shortVersion"
         shell: pwsh
 
       - name: Show plugin short version
@@ -97,7 +100,7 @@ jobs:
 
       - name: Create release ZIP
         run: |
-          $zipName = "plug-v${{ steps.plugin_version.outputs.short_version }}-mod-v${{ steps.module_version.outputs.short_version }}.zip"
+          $zipName = "VPilotNotifications--plug-v${{ steps.plugin_version.outputs.short_version }}-mod-v${{ steps.module_version.outputs.short_version }}.zip"
           Compress-Archive -Path "out/plugin/*" -DestinationPath $zipName -Force
           echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
         shell: pwsh
