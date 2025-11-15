@@ -102,5 +102,16 @@ jobs:
           echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
         shell: pwsh
 
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.ZIP_NAME }}
+          name: ${{ env.ZIP_NAME }}
+          files: ${{ env.ZIP_NAME }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
