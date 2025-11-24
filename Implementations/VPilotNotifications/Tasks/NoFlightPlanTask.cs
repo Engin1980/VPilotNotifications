@@ -26,7 +26,7 @@ namespace Eng.VPilotNotifications.Tasks
     {
       EAssert.Argument.IsNotNull(config, nameof(config));
 
-      Logger.Log(LogLevel.INFO, "NoFlightPlanTask initializing.");
+      Logger.Log(LogLevel.INFO, "Initializing.");
 
       this.config = config;
 
@@ -55,7 +55,7 @@ namespace Eng.VPilotNotifications.Tasks
         base.SendSystemPrivateMessage($"NoFlightPlan audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
       }
 
-      Logger.Log(LogLevel.INFO, $"NoFlightPlanTask initialized.");
+      Logger.Log(LogLevel.INFO, $"Initialized.");
     }
 
     private void Broker_FlightPlanDetectionOnConnection(object? sender, NetworkConnectedEventArgs e)

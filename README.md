@@ -52,6 +52,9 @@ For any issue, feel free to raise a new issue at the [Issues](https://github.com
 
 # Version history
 
+**v2.3 - 2025-11-24**
+* Added SELCAL alert notification
+
 **v2.2 - 2025-11-14**
 * Migrated to .NET 8
 * Custom random pipe name (no more configuration)

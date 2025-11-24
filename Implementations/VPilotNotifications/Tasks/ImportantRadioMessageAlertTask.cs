@@ -19,7 +19,7 @@ namespace Eng.VPilotNotifications.Tasks
     {
       EAssert.Argument.IsNotNull(config, nameof(config));
 
-      Logger.Log(LogLevel.DEBUG, $"ImportantRadioMessageAlertTask initializing.");
+      Logger.Log(LogLevel.DEBUG, $"Initializing.");
 
       this.config = config;
       this.Broker.NetworkConnected += (s, e) => this.connectedCallsign = e.Callsign.ToUpperInvariant();
@@ -33,7 +33,7 @@ namespace Eng.VPilotNotifications.Tasks
         base.SendSystemPrivateMessage($"Important radio message audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
       }
 
-      Logger.Log(LogLevel.DEBUG, $"ImportantRadioMessageAlertTask initialized.");
+      Logger.Log(LogLevel.INFO, $"Initialized.");
     }
 
     private void Broker_RadioMessageReceived(object? sender, RadioMessageReceivedEventArgs e)
@@ -41,9 +41,13 @@ namespace Eng.VPilotNotifications.Tasks
       Logger.Log(LogLevel.DEBUG, $"Radio message received: {e.Message}");
 
       bool isImportant = IsMessageToMonitoredDataMatch(e.Message);
-      Logger.Log(LogLevel.TRACE, $"Message '{e.Message}' is important: {isImportant}");
+      Logger.Log(LogLevel.DEBUG, $"Message '{e.Message}' is important: {isImportant}");
       if (isImportant)
+      {
+        Logger.Log(LogLevel.INFO, $"Message '{e.Message}' alerted");
         Audio.PlayAudioFile(this.config.AudioFile.Name, this.config.AudioFile.Volume);
+      }
+
     }
 
     private bool IsMessageToMonitoredDataMatch(string message)
@@ -63,7 +67,7 @@ namespace Eng.VPilotNotifications.Tasks
             ret = true;
         }
       }
-      this.Logger.Log(LogLevel.TRACE, $"Message '{message}' checked with result {ret}");
+      this.Logger.Log(LogLevel.DEBUG, $"Message '{message}' checked with result {ret}");
       return ret;
     }
   }

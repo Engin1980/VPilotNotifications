@@ -39,7 +39,8 @@ namespace Eng.VPilotNotifications.Tasks
 
     public ContactMeTask(TaskInitData data, ContactMeConfig config) : base(data)
     {
-      Logger.Log(LogLevel.INFO, "ContactMeTask initalizing.");
+      Logger.Log(LogLevel.DEBUG, "Initializing.");
+
       this.config = config ?? throw new ArgumentNullException(nameof(config), "ContactMeConfig cannot be null.");
 
       Logger.Log(LogLevel.DEBUG, "Registering event handlers for network and radio messages.");
@@ -70,7 +71,7 @@ namespace Eng.VPilotNotifications.Tasks
         base.SendSystemPrivateMessage($"Contact-Me audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
       }
 
-      Logger.Log(LogLevel.INFO, "ContactMeTask initialized.");
+      Logger.Log(LogLevel.INFO, "Initialized.");
     }
 
     private void CheckTimer_Elapsed(object? sender, ElapsedEventArgs e)

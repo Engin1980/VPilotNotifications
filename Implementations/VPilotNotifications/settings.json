@@ -35,6 +35,10 @@
         "Level": "INFO"
       },
       {
+        "Pattern": "SelcalAlertTask",
+        "Level": "INFO"
+      },
+      {
         "Pattern": "VPilotNotifications.Program",
         "Level": "INFO"
       },
@@ -83,7 +87,7 @@
     "SelcalAlert": {
       "Enabled": true,
       "AudioFile": {
-        "Name": "Sounds\\radioTextMessage.mp3",
+        "Name": "Sounds\\selcal.mp3",
         "Volume": 1
       }
     }

@@ -16,8 +16,17 @@ namespace Eng.VPilotNotifications.Tasks
 
     public SelCalAlertTask(TaskInitData data, SelcalAlertConfig config) : base(data)
     {
+      Logger.Log(LogLevel.DEBUG, "Initializing.");
       this.config = config;
       data.Broker.SelcalAlertReceived += Broker_SelcalAlertReceived;
+
+      Logger.Log(LogLevel.DEBUG, $"Checking the sound file '{config.AudioFile.Name}' for existence.");
+      if (!System.IO.File.Exists(config.AudioFile.Name))
+      {
+        Logger.Log(LogLevel.ERROR, $"Audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+        base.SendSystemPrivateMessage($"Selcal-alert audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
+      }
+
       Logger.Log(LogLevel.INFO, "Initialized.");
     }
 

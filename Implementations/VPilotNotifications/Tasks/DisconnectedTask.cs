@@ -20,7 +20,7 @@ namespace Eng.VPilotNotifications.Tasks
     {
       EAssert.Argument.IsNotNull(config, nameof(config));
 
-      Logger.Log(LogLevel.INFO, "DisconnectedTask initializing.");
+      Logger.Log(LogLevel.DEBUG, "Initializing.");
 
       this.config = config;
       this.checkTimer = new System.Timers.Timer(config.RepeatInterval * 1000)
@@ -51,7 +51,7 @@ namespace Eng.VPilotNotifications.Tasks
         base.SendSystemPrivateMessage($"Disconnected audio file '{config.AudioFile.Name}' does not exist. Please check the configuration.");
       }
 
-      Logger.Log(LogLevel.INFO, "DisconnectedTask initialized.");
+      Logger.Log(LogLevel.INFO, "Initialized.");
     }
 
     private void CheckTimer_Elapsed(object? sender, ElapsedEventArgs e)
@@ -66,7 +66,6 @@ namespace Eng.VPilotNotifications.Tasks
     private void NotifyDisconnected()
     {
       Logger.Log(LogLevel.INFO, "Network is disconnected. Playing warning sound.");
-      //TOREM unable to do when disconnected: base.SendSystemPrivateMessage("Network disconnected. Please check your connection.");
       Audio.PlayAudioFile(this.config.AudioFile.Name, this.config.AudioFile.Volume);
     }
   }
