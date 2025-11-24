@@ -42,6 +42,9 @@ namespace Eng.VPilotNotifications.Settings
 
     [Required]
     public DisconnectedConfig Disconnected { get; set; } = null!;
+
+    [Required]
+    public SelcalAlertConfig SelcalAlert { get; set; } = null!;
   }
 
   public class ContactMeConfig
@@ -55,6 +58,13 @@ namespace Eng.VPilotNotifications.Settings
     [Range(1, int.MaxValue)]
     public int RepeatSoundInterval { get; set; }
 
+    [Required]
+    public AudioFileConfig AudioFile { get; set; } = null!;
+  }
+
+  public class SelcalAlertConfig
+  {
+    public bool Enabled { get; set; }
     [Required]
     public AudioFileConfig AudioFile { get; set; } = null!;
   }

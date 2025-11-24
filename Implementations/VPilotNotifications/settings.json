@@ -79,6 +79,13 @@
         "Name": "Sounds\\disconnected.mp3",
         "Volume": 1
       }
+    },
+    "SelcalAlert": {
+      "Enabled": true,
+      "AudioFile": {
+        "Name": "Sounds\\radioTextMessage.mp3",
+        "Volume": 1
+      }
     }
   },
   "Vatsim": {

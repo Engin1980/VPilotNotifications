@@ -195,6 +195,13 @@ namespace Eng.VPilotNotifications
         at = new NoFlightPlanTask(taskInitData, config.Tasks.NoFlightPlan);
         tasks.Add(at);
       }
+
+      if (config.Tasks.SelcalAlert.Enabled)
+      {
+        logger.Log(LogLevel.INFO, "Starting SELCAL alert task...");
+        at = new SelCalAlertTask(taskInitData, config.Tasks.SelcalAlert);
+        tasks.Add(at);
+      }
     }
 
     private static string ConfigAbsoluteFilePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, CONFIG_FILE_NAME);
